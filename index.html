@@ -1,31 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <head>
-<title>Hello</title>
+<title>Page Title</title>
 <!-- <link rel="icon" type="image/x-icon" href="graph.png"> -->
 </head>
 <body style="margin:0;">
 
 <div id="app"></div>
-<script src="https://d3js.org/d3.v7.min.js">
-    const svg = d3.select('#app').append('svg');
-
-    const circle = svg.append('circle');
-
-    svg.attr('width', window.innerWidth)
-    svg.attr('height', window.innerHeight)
-
-    circle.attr('cx', 50)
-    circle.attr('cy', 50)
-
-    circle.attr('r', 30);
-
-    svg.on('mousemove', (event) => {
-        console.log(event)
-        circle.attr('cx', event.x);
-        circle.attr('cy', event.y);
-    });
-</script>
+<script type="module" src="/main.js"></script>
 
 <div>Hi</div>
 
