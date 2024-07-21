@@ -5,6 +5,9 @@ const circle = svg.append('circle');
 svg.attr('width', window.innerWidth)
 svg.attr('height', window.innerHeight)
 
+circle.attr('cx', 50)
+circle.attr('cy', 50)
+
 circle.attr('r', 30);
 
 svg.on('mousemove', (event) => {
