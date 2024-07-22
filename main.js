@@ -1,12 +1,9 @@
 const svg = d3.select('#app').append('svg');
-
-
-
-const hallo = svg.append('rect');
-const hallo2 = svg.append('rect');
-const hallo3 = svg.append('rect');
 const hallo4 = svg.append('rect');
 const hallo5 = svg.append('rect');
+const hi = svg.append('polygon')
+
+hi.attr('points', '100,100 150,100 150,200 250,200 250,350 200,350 200,250 150,250 150,350 100,350')
 
 const circle = svg.append('circle');
 
@@ -15,21 +12,6 @@ svg.attr('height', window.innerHeight);
 
 circle.attr('r', 30);
 circle.attr('fill', 'red');
-
-hallo.attr('x', 100);
-hallo.attr('y', 100);
-hallo.attr('height', 250);
-hallo.attr('width', 50);
-
-hallo2.attr('x', 200);
-hallo2.attr('y', 200);
-hallo2.attr('height', 150);
-hallo2.attr('width', 50);
-
-hallo3.attr('x', 150);
-hallo3.attr('y', 200);
-hallo3.attr('height', 50);
-hallo3.attr('width', 50);
 
 hallo4.attr('x', 300);
 hallo4.attr('y', 200);
