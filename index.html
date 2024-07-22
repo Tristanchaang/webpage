@@ -16,6 +16,13 @@
         for (let shape of shapelist) {shape.attr(prop, val)}
     }
 
+    function animate(func, duration, delay=0) {
+        d3.timer((elapsed) => {
+            func(elapsed);
+            if (elapsed > duration) t.stop();
+            }, delay)
+    }
+
     const svg = d3.select('#app').append('svg');
     svg.attr('width', window.innerWidth);
     svg.attr('height', window.innerHeight);
@@ -44,19 +51,19 @@
         circle.attr('cy', event.y);
     });
 
+    let fadespeed = 1
+
     svg.on('click', (event) => {
         console.log(event.x, event.y);
         if (toggleclick) {
-            d3.timer((elapsed) => {
-                changeattr([hi,hi2,hi3],'fill-opacity', 1-elapsed/3000);
-                if (elapsed > 3000) t.stop();
-                })
+            animate((elapsed) => {
+                changeattr([hi,hi2,hi3],'fill-opacity', 1-elapsed/(2000/fadespeed));
+                }, 2000/fadespeed)
             toggleclick = false;
         } else {
-            d3.timer((elapsed) => {
-                changeattr([hi,hi2,hi3],'fill-opacity', elapsed/3000);
-                if (elapsed > 3000) t.stop();
-                })
+            animate((elapsed) => {
+                changeattr([hi,hi2,hi3],'fill-opacity', elapsed/(2000/fadespeed));
+                }, 2000/fadespeed)
             toggleclick = true;
         }
     })
