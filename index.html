@@ -8,31 +8,37 @@
 <body style="margin:0;overflow:0;">
 
 <div id="app"></div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
+<!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+<script src="d3.js"></script>
 <script type="module">
+
+    function changeattr(shapelist,prop,val) {
+        for (let shape of shapelist) {shape.attr(prop, val)}
+    }
+
     const svg = d3.select('#app').append('svg');
-    const hallo4 = svg.append('rect');
+    svg.attr('width', window.innerWidth);
+    svg.attr('height', window.innerHeight);
+
     const hi = svg.append('polygon')
+    const hi2 = svg.append('polygon')
+    const hi3 = svg.append('polygon')
 
     let toggleclick = true;
 
     hi.attr('points', '100,100 150,100 150,200 250,200 250,350 200,350 200,250 150,250 150,350 100,350')
     hi.attr('fill-opacity', 1);
+    hi2.attr('points', '300,200 350,200 350,350 300,350')
+    hi3.attr('points', '300,100 350,100 350,150 300,150')
 
     const circle = svg.append('circle');
-
-    svg.attr('width', window.innerWidth);
-    svg.attr('height', window.innerHeight);
-
     circle.attr('r', 30);
     circle.attr('fill', 'red');
 
-    hallo4.attr('x', 300);
-    hallo4.attr('y', 200);
-    hallo4.attr('height', 150);
-    hallo4.attr('width', 50);
-    hallo4.attr('fill-opacity', 1);
-
+    const circle2 = svg.append('circle');
+    circle2.attr('r', 30);
+    circle2.attr('fill', 'blue');
+    
     svg.on('mousemove', (event) => {
         circle.attr('cx', event.x);
         circle.attr('cy', event.y);
@@ -41,16 +47,33 @@
     svg.on('click', (event) => {
         console.log(event.x, event.y);
         if (toggleclick) {
-            hi.attr('fill-opacity', 0);
-            hallo4.attr('fill-opacity', 0);
+            d3.timer((elapsed) => {
+                changeattr([hi,hi2,hi3],'fill-opacity', 1-elapsed/8000);
+                if (elapsed > 8000) t.stop();
+                })
             toggleclick = false;
-        }
-        else {
-            hi.attr('fill-opacity', 1);
-            hallo4.attr('fill-opacity', 1);
+        } else {
+            d3.timer((elapsed) => {
+                changeattr([hi,hi2,hi3],'fill-opacity', elapsed/8000);
+                if (elapsed > 8000) t.stop();
+                })
             toggleclick = true;
         }
-    });
+    })
+    
+    d3.select("body").on('keydown', (event) => {
+        console.log(event);
+    })
+
+    const t = d3.timer((elapsed) => {
+
+        // console.log(Math.random())
+        circle2.attr('cx', 50+0.1*elapsed);
+        circle2.attr('cy', 100);
+
+        if (elapsed > 2000) t.stop();
+        });
+    ;
 </script>
 
 </body>
