@@ -48,14 +48,14 @@
         console.log(event.x, event.y);
         if (toggleclick) {
             d3.timer((elapsed) => {
-                changeattr([hi,hi2,hi3],'fill-opacity', 1-elapsed/8000);
-                if (elapsed > 8000) t.stop();
+                changeattr([hi,hi2,hi3],'fill-opacity', 1-elapsed/3000);
+                if (elapsed > 3000) t.stop();
                 })
             toggleclick = false;
         } else {
             d3.timer((elapsed) => {
-                changeattr([hi,hi2,hi3],'fill-opacity', elapsed/8000);
-                if (elapsed > 8000) t.stop();
+                changeattr([hi,hi2,hi3],'fill-opacity', elapsed/3000);
+                if (elapsed > 3000) t.stop();
                 })
             toggleclick = true;
         }
