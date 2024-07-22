@@ -17,9 +17,9 @@
     }
 
     function animate(func, duration, delay=0) {
-        d3.timer((elapsed) => {
+        let t = d3.timer((elapsed) => {
             func(elapsed);
-            if (elapsed > duration) t.stop();
+            if (elapsed >= duration) {t.stop();}
             }, delay)
     }
 
@@ -52,9 +52,10 @@
     });
 
     let fadespeed = 1
+    let movespeed = 1
 
     svg.on('click', (event) => {
-        console.log(event.x, event.y);
+        
         if (toggleclick) {
             animate((elapsed) => {
                 changeattr([hi,hi2,hi3],'fill-opacity', 1-elapsed/(2000/fadespeed));
@@ -66,20 +67,28 @@
                 }, 2000/fadespeed)
             toggleclick = true;
         }
+
+        let newx = event.x;
+        let newy = event.y;
+        let curx = circle2.attr('cx');
+        let cury = circle2.attr('cy');
+        let dx = newx-curx;
+        let dy = newy-cury;
+        let dist = (dx**2 + dy**2)**0.5;
+
+        animate((elapsed) => {
+            circle2.attr('cx', curx * (1-elapsed * movespeed /dist) + newx * elapsed * movespeed /dist)
+            circle2.attr('cy', cury * (1-elapsed * movespeed /dist) + newy * elapsed * movespeed /dist)
+        },dist/(movespeed))
+
+        circle2.attr('cx', newx);
+        circle2.attr('cy', newy);
     })
     
     d3.select("body").on('keydown', (event) => {
         console.log(event);
     })
 
-    const t = d3.timer((elapsed) => {
-
-        // console.log(Math.random())
-        circle2.attr('cx', 50+0.1*elapsed);
-        circle2.attr('cy', 100);
-
-        if (elapsed > 2000) t.stop();
-        });
     ;
 </script>
 
