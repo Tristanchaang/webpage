@@ -43,9 +43,15 @@ function findNode(coord) {
     }
 }
 
+function enterPressed() {
+    processInput();
+    inputstatus = "";
+    clickqueue = [];
+}
+
 const space = d3.select("body")
 const svg = space.append("svg")
-setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight})
+setattrs(svg, {'width': window.innerWidth - 30, 'height': window.innerHeight})
 svg.append("div").attr("id", "divider")
 
 const circle = svg.append("circle")
