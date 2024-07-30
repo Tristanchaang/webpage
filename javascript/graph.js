@@ -155,9 +155,16 @@ d3.select("body").on('keydown', (event) => {
     console.log(inputstatus)
 })
 
+let autonodenumber = 1
+
 function processInput() {
-    if (clickqueue.length === 1 && inputstatus) {
-        new node(clickqueue[0][0], clickqueue[0][1], inputstatus)
+    if (clickqueue.length === 1) {
+        if (inputstatus) {
+            new node(clickqueue[0][0], clickqueue[0][1], inputstatus);
+        } else {
+            new node(clickqueue[0][0], clickqueue[0][1], autonodenumber);
+            autonodenumber += 1;
+        }
     }
 
     if (clickqueue.length === 2) {
