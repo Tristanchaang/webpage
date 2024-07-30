@@ -47,17 +47,20 @@ function enterPressed() {
     processInput();
     inputstatus = "";
     clickqueue = [];
+    updateToolbarQueue();
 }
 
 function escPressed() {
     inputstatus = "";
-    clickqueue = []
+    clickqueue = [];
+    updateToolbarQueue();
 }
 
 function delPressed() {
     processDeletion();
     inputstatus = "";
-    clickqueue = []
+    clickqueue = [];
+    updateToolbarQueue();
 }
 
 const offset = 53
@@ -150,10 +153,7 @@ svg.on('click', (event) => {
     }
     nodeisclicked = false;
 
-    //d3.select("#clickqueue").remove()
-    //d3.select("#toolbar")
-    //    .append("div").attr("id", "toolbar").attr("style","float: right;")
-    //    .append("text").text(clickqueue)
+    updateToolbarQueue();
     console.log(clickqueue)
 })
 
@@ -192,6 +192,40 @@ function processInput() {
 
 function processDeletion() {
     
+}
+
+function updateToolbarQueue() {
+    d3.select("#clickqueue").remove()
+    queuebox = d3.select("#toolbar")
+                .append("div")
+                .attr("id", "clickqueue")
+                .attr("style", "float: right; margin: 0;")
+                .attr("height", 43)
+                .attr("width", 43)
+    for (const curclick of clickqueue.toReversed()) {
+
+        const elbox = queuebox.append("svg")
+                            .attr("height", 43).attr("width", 43)
+                            .attr("style", "float: right; margin: 0;")
+
+        if (curclick[2] == "empty") {
+            for (const drawpath of ["M 16 6 L 6 6 L 6 16", "M 27 37 L 37 37 L 37 27", "M 27 6 L 37 6 L 37 16", "M 6 27 L 6 37 L 16 37"]) {
+                elbox.append("path")
+                    .attr("d", drawpath)
+                    .attr("fill", "none")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 3)
+            }
+        }
+
+        if (curclick[2] == "node") {
+            elbox.append("circle")
+                    .attr("cx", 21.5).attr("cy", 21.5).attr("r", 15)
+                    .attr("fill", "rgb(200,200,200)")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 3)
+        }
+    }
 }
 
 const N = 10;
