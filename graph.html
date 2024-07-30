@@ -21,11 +21,21 @@
     <button onclick="escPressed()" style="padding: 8px 30px; background-color: pink;">Esc</button>
     <button onclick="delPressed()" style="padding: 8px 30px; background-color: pink;">Del</button>
     <button onclick="helpPressed()" style="padding: 8px 50px; background-color: yellow;">How to Use?</button>
-    <div id="toolbarright" style="float: right;">
     <div id="clickqueue" style="float: right;"></div>
-    </div>
-&nbsp;&nbsp;
 </div>
+
+<div id="tutorial" class="">
+    <div id="tutorial-header" style="font-size: 1.25rem; font-weight: bold; background-color:lightgray;">
+        How to Use
+        <button onclick="closeTutorial()" style="float: right; cursor: pointer;">&times;</button>
+    </div>
+
+    <div id="tutorial-body">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore voluptatum assumenda unde non accusamus expedita nesciunt laboriosam id aliquam iusto veritatis, laudantium, placeat deleniti rem natus enim incidunt est dicta.
+    </div>
+</div>
+
+<div id="overlay" class=""></div>
 
 </body>
 

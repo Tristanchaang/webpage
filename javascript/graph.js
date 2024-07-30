@@ -64,7 +64,13 @@ function delPressed() {
 }
 
 function helpPressed() {
+    d3.select("#tutorial").attr("class", "active")
+    d3.select("#overlay").attr("class", "active")
+}
 
+function closeTutorial() {
+    d3.select("#tutorial").attr("class", "")
+    d3.select("#overlay").attr("class", "")
 }
 
 const offset = 53
@@ -200,7 +206,7 @@ function processDeletion() {
 
 function updateToolbarQueue() {
     d3.select("#clickqueue").remove() // remove clickqueue element
-    queuebox = d3.select("#toolbarright") // reinsert new clickqueue element
+    queuebox = d3.select("#toolbar") // reinsert new clickqueue element
                 .append("div")
                 .attr("id", "clickqueue")
                 .attr("style", "float: right; margin: 0;")

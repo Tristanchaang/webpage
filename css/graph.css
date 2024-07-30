@@ -3,3 +3,49 @@ button {
     font-weight: bold;
     cursor: pointer;
 }
+
+#tutorial {
+    position: fixed;
+    top: 40%;
+    left: 40%;
+    transform: translate(-33.3%, -33.3%) scale(0);
+    border: 1px solid black;
+    z-index: 1;
+    background-color: white;
+    width: 500px;
+    max-width: 80%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#tutorial.active {
+    transform: translate(-33.3%, -33.3%) scale(1);
+}
+
+#tutorial-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black;
+}
+
+#tutorial-body {
+    padding: 10px 15px
+}
+
+#overlay {
+    position: fixed;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.75);
+    pointer-events: none;
+}
+
+#overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
