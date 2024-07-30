@@ -12,15 +12,19 @@
 </head>
 
 
+
 <body style="margin:0;overflow:0;">
-
+<link rel="stylesheet" href="css/graph.css">
 <br>
-
-<div id="toolbar">&nbsp&nbsp
-<button onclick="enterPressed()" style="padding: 8px 50px; background-color: greenyellow; font-size: 20px; font-weight: bold;">Enter</button>
-<button onclick="escPressed()" style="padding: 8px 50px; background-color: pink; font-size: 20px;  font-weight: bold;">Esc</button>
-<button onclick="delPressed()" style="padding: 8px 50px; background-color: pink; font-size: 20px;  font-weight: bold;">Del</button>
-<svg id="clickqueue" style="float: right" height=43>&nbsp&nbsp</svg>
+<div id="toolbar">&nbsp;&nbsp;
+    <button onclick="enterPressed()" style="padding: 8px 50px; background-color: greenyellow;">Enter</button>
+    <button onclick="escPressed()" style="padding: 8px 30px; background-color: pink;">Esc</button>
+    <button onclick="delPressed()" style="padding: 8px 30px; background-color: pink;">Del</button>
+    <button onclick="helpPressed()" style="padding: 8px 50px; background-color: yellow;">How to Use?</button>
+    <div id="toolbarright" style="float: right;">
+    <div id="clickqueue" style="float: right;"></div>
+    </div>
+&nbsp;&nbsp;
 </div>
 
 </body>

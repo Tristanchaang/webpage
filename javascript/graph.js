@@ -63,6 +63,10 @@ function delPressed() {
     updateToolbarQueue();
 }
 
+function helpPressed() {
+
+}
+
 const offset = 53
 const space = d3.select("body")
 const svg = space.append("svg")
@@ -195,8 +199,8 @@ function processDeletion() {
 }
 
 function updateToolbarQueue() {
-    d3.select("#clickqueue").remove()
-    queuebox = d3.select("#toolbar")
+    d3.select("#clickqueue").remove() // remove clickqueue element
+    queuebox = d3.select("#toolbarright") // reinsert new clickqueue element
                 .append("div")
                 .attr("id", "clickqueue")
                 .attr("style", "float: right; margin: 0;")
