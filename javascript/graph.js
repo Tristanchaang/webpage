@@ -220,18 +220,16 @@ function updateToolbarQueue() {
         }
 
         if (curclick[2] == "node") {
-            for (const drawpath of ["M 37 6 L 6 37"]) {
-                elbox.append("path")
-                    .attr("d", drawpath)
-                    .attr("fill", "none")
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 3)
-                }
+            elbox.append("path")
+                .attr("d", ["M 37 6 L 6 37"])
+                .attr("fill", "none")
+                .attr("stroke", "black")
+                .attr("stroke-width", 3)
             elbox.append("circle")
-                    .attr("cx", 21.5).attr("cy", 21.5).attr("r", 15)
-                    .attr("fill", "rgb(200,200,200)")
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 3)
+                .attr("cx", 21.5).attr("cy", 21.5).attr("r", 15)
+                .attr("fill", "rgb(200,200,200)")
+                .attr("stroke", "black")
+                .attr("stroke-width", 3)
             
         }
     }
