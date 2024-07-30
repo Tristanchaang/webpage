@@ -21,9 +21,20 @@ function nearestMultiple(num, mul) {
     return Math.round(num/mul) * mul
 }
 
-const space = d3.select("#app")
+function processInput() {
+    if (clickqueue && inputstatus) {
+        new node(clickqueue[0][0], clickqueue[0][1], inputstatus)
+    }
+}
+
+function nodeClicked() {
+    console.log("Node Selected")
+}
+
+const space = d3.select("body")
 const svg = space.append("svg")
 setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight})
+svg.append("div").attr("id", "divider")
 
 const circle = svg.append("circle")
 
@@ -43,29 +54,28 @@ class node {
         this.label = label;
         
         nodelist[[x,y]] = svg.append("g")
-        nodelist[[x,y]].attr("id", "node:"+label)
-
-        const clicker = nodelist[[x,y]].append("a")
-        setattrs(clicker.append("circle"), {
-            "cx": x, "cy": y, "r": 25, 
-            "fill": "black", 
-            "stroke": "black",
-            "stroke-width": 5,
-            "fill-opacity": 0.2
-        })
-        setattrs(clicker, {
-            "onclick": "nodeclicked()",
+        setattrs(nodelist[[x,y]], {
+            "id": "node:"+label,
+            "onclick": "nodeClicked()",
             "style": "cursor: pointer;"
         })
 
-        const labe = nodelist[[x,y]].insert("text", "a")
-        labe.text(String(label))
-        setattrs(labe, {
+        const nodecirc = nodelist[[x,y]].append("circle")
+        setattrs(nodecirc, {
+            "cx": x, "cy": y, "r": 25, 
+            "fill": "rgb(200,200,200)", 
+            "stroke": "black",
+            "stroke-width": 5,
+        })
+
+        const nodelabel = nodelist[[x,y]].append("text")
+        nodelabel.text(String(label))
+        setattrs(nodelabel, {
             "x": x, "y": y,
             "text-anchor": "middle",
             "dominant-baseline": "central",
             "font-size": 25,
-            // "font-family": "Arial, Helvetica, sans-serif",
+            "font-family": "Arial, Helvetica, sans-serif",
             "font-weight": "bold"
         })
     }
@@ -89,7 +99,7 @@ svg.on('click', (event) => {
 d3.select("body").on('keydown', (event) => {
     
     if (event.key === "Enter") {
-        processinput();
+        processInput();
         inputstatus = "";
         clickqueue = [];
     } else if (event.key === "Escape") {
@@ -101,12 +111,7 @@ d3.select("body").on('keydown', (event) => {
     console.log(inputstatus)
 })
 
-function processinput() {
-    if (clickqueue && inputstatus) {
-        new node(clickqueue[0][0], clickqueue[0][1], inputstatus)
-    }
-}
+svg.insert("path", "#divider")
+    .attr("d", "M 100 350 Q 250 50 400 350")
+    .attr("style", "fill:none; stroke:black; stroke-width:5;")
 
-function nodeclicked() {
-    console.log("Node Selected")
-}
