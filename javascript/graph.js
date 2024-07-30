@@ -184,8 +184,8 @@ function processInput() {
     }
 
     if (clickqueue.length === 2) {
-        const start = findNode(clickqueue[0].split(0,2));
-        const end = findNode(clickqueue[1].split(0,2));
+        const start = findNode(clickqueue[0].slice(0,2));
+        const end = findNode(clickqueue[1].slice(0,2));
         new edge(start, end, inputstatus);
     }
 }
