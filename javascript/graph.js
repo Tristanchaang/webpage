@@ -54,9 +54,14 @@ function escPressed() {
     clickqueue = []
 }
 
+function delPressed() {
+    inputstatus = "";
+    clickqueue = []
+}
+
 const space = d3.select("body")
 const svg = space.append("svg")
-setattrs(svg, {'width': window.innerWidth - 30, 'height': window.innerHeight})
+setattrs(svg, {'width': window.innerWidth - 53, 'height': window.innerHeight})
 svg.append("div").attr("id", "divider")
 
 const circle = svg.append("circle")
@@ -151,6 +156,8 @@ d3.select("body").on('keydown', (event) => {
         enterPressed();
     } else if (event.key === "Escape") {
         escPressed();
+    } else if (event.key === "Backspace") {
+        delPressed();
     } else {
         inputstatus += event.key
     }
