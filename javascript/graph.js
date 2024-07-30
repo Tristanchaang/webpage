@@ -55,13 +55,15 @@ function escPressed() {
 }
 
 function delPressed() {
+    processDeletion();
     inputstatus = "";
     clickqueue = []
 }
 
+const offset = 53
 const space = d3.select("body")
 const svg = space.append("svg")
-setattrs(svg, {'width': window.innerWidth - 53, 'height': window.innerHeight})
+setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight - offset})
 svg.append("div").attr("id", "divider")
 
 const circle = svg.append("circle")
@@ -144,9 +146,14 @@ let inputstatus = "";
 
 svg.on('click', (event) => {
     if (!nodeisclicked) {
-        clickqueue.push([nearestMultiple(event.x,50), nearestMultiple(event.y,50)])
+        clickqueue.push([nearestMultiple(event.x,50), nearestMultiple(event.y-offset,50), "empty"])
     }
     nodeisclicked = false;
+
+    d3.select("#clickqueue").remove()
+    d3.select("#toolbar")
+        .append("div").attr("id", "toolbar").attr("style","float: right;")
+        .append("text").text(clickqueue)
     console.log(clickqueue)
 })
 
@@ -177,15 +184,19 @@ function processInput() {
     }
 
     if (clickqueue.length === 2) {
-        const start = findNode(clickqueue[0]);
-        const end = findNode(clickqueue[1]);
-        new edge(start, end, inputstatus)
+        const start = findNode(clickqueue[0].split(0,2));
+        const end = findNode(clickqueue[1].split(0,2));
+        new edge(start, end, inputstatus);
     }
 }
 
-const N = 5;
+function processDeletion() {
+    
+}
+
+const N = 10;
 
 for (let i = 0; i < N; i++) {
-    let hi = new node(200 + 100 * Math.sin(2 * Math.PI * i / N), 
+    new node(200 + 100 * Math.sin(2 * Math.PI * i / N), 
     200 - 100 * Math.cos(2 * Math.PI * i / N), "a"+String(i))
 }
