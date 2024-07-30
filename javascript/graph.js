@@ -25,7 +25,7 @@ let nodeisclicked = false;
 function nodeClicked(thisid) {
     console.log("Node Selected: " + thisid)
     const findhtml = d3.select("#"+thisid).select("circle");
-    clickqueue.push([Number(findhtml.attr("cx")),Number(findhtml.attr("cy"))])
+    clickqueue.push([Number(findhtml.attr("cx")),Number(findhtml.attr("cy")),"node"])
     nodeisclicked = true;
 }
 
