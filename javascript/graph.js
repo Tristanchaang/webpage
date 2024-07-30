@@ -49,6 +49,11 @@ function enterPressed() {
     clickqueue = [];
 }
 
+function escPressed() {
+    inputstatus = "";
+    clickqueue = []
+}
+
 const space = d3.select("body")
 const svg = space.append("svg")
 setattrs(svg, {'width': window.innerWidth - 30, 'height': window.innerHeight})
@@ -143,12 +148,9 @@ svg.on('click', (event) => {
 d3.select("body").on('keydown', (event) => {
     
     if (event.key === "Enter") {
-        processInput();
-        inputstatus = "";
-        clickqueue = [];
+        enterPressed();
     } else if (event.key === "Escape") {
-        inputstatus = "";
-        clickqueue = []
+        escPressed();
     } else {
         inputstatus += event.key
     }
