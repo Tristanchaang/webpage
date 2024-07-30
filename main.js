@@ -167,3 +167,5 @@ for (let i = 0; i < N; i++) {
     let hi = new node(200 + 100 * Math.sin(2 * Math.PI * i / N), 
     200 - 100 * Math.cos(2 * Math.PI * i / N), "a"+String(i))
 }
+
+const hi=5;
