@@ -202,9 +202,10 @@ function updateToolbarQueue() {
                 .attr("style", "float: right; margin: 0;")
                 .attr("height", 43)
                 .attr("width", 43)
-    for (const curclick of clickqueue.toReversed()) {
 
-        const elbox = queuebox.append("svg")
+    for (const curclick of clickqueue) {
+
+        const elbox = queuebox.insert("svg", "svg")
                             .attr("height", 43).attr("width", 43)
                             .attr("style", "float: right; margin: 0;")
 
