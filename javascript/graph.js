@@ -150,10 +150,10 @@ svg.on('click', (event) => {
     }
     nodeisclicked = false;
 
-    d3.select("#clickqueue").remove()
-    d3.select("#toolbar")
-        .append("div").attr("id", "toolbar").attr("style","float: right;")
-        .append("text").text(clickqueue)
+    //d3.select("#clickqueue").remove()
+    //d3.select("#toolbar")
+    //    .append("div").attr("id", "toolbar").attr("style","float: right;")
+    //    .append("text").text(clickqueue)
     console.log(clickqueue)
 })
 
