@@ -59,7 +59,11 @@ function closeTutorial() {
 
 const offset = document.getElementById("toppart").offsetHeight;
 const svg = d3.select("body").append("svg");
-setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight - offset});
+setattrs(svg, {
+    'width': window.innerWidth, 
+    'height': window.innerHeight - offset,
+    'style': "top: " + offset + "px; position: fixed;",
+});
 svg.append("div").attr("id", "divider");
 
 nodelist = Object() // {[x,y]: d3objectrepresentation, ...}
@@ -175,9 +179,7 @@ function processInput() {
     }
 
     if (clickqueue.length === 2) {
-        const start = findNode(clickqueue[0].slice(0,2));
-        const end = findNode(clickqueue[1].slice(0,2));
-        new edge(start, end, inputstatus);
+        new edge(clickqueue[0].slice(0,2), clickqueue[1].slice(0,2), inputstatus);
     }
 }
 
