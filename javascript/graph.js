@@ -18,17 +18,17 @@ function nearestMultiple(num, mul) {return Math.round(num/mul) * mul}
 let nodeisclicked = false;
 function nodeClicked(thisid) {
     // console.log("Node Selected: " + thisid)
-    const findhtml = d3.select("#"+thisid).select("circle");
-    clickqueue.push(["node",Number(findhtml.attr("cx")),Number(findhtml.attr("cy"))])
+    const splitted = thisid.split("-");
+    clickqueue.push(["node",Number(splitted[1]),Number(splitted[2])])
     nodeisclicked = true;
 }
 
 let edgeisclicked = false;
 function edgeClicked(thisid) {
     // console.log("Node Selected: " + thisid)
-    const findhtml = d3.select("#"+thisid).select("circle");
-    clickqueue.push(["edge",Number(findhtml.attr("cx")),Number(findhtml.attr("cy"))])
-    nodeisclicked = true;
+    const splitted = thisid.split("-");
+    clickqueue.push(["edge",Number(splitted[1]),Number(splitted[2]),Number(splitted[3]),Number(splitted[4])])
+    edgeisclicked = true;
 }
 
 function midPoint(coord1,coord2) {
@@ -117,7 +117,7 @@ class edge {
 
         const thisedge = svg.insert("g", "#divider")
                             .attr("id", "edge-"+String(node1[0])+"-"+String(node1[1])+"-"+String(node2[0])+"-"+String(node2[1]))
-                            .attr("onclick", "edgeClicked()")
+                            .attr("onclick", "edgeClicked(this.id)")
                             .attr("style", "cursor: pointer;")
         
         adjlist[node1][0].push([node2, thisedge]);
@@ -141,13 +141,14 @@ let clickqueue = [];
 let inputstatus = "";
 
 svg.on('click', (event) => {
-    if (!nodeisclicked) {
+    if (!nodeisclicked && !edgeisclicked) {
         clickqueue.push(["empty",nearestMultiple(event.x,50), nearestMultiple(event.y-offset,50)])
     }
     nodeisclicked = false;
+    edgeisclicked = false;
 
     updateToolbarQueue();
-    // console.log(clickqueue)
+    // console.log(clickqueue) // uncomment to show real clickqueue
 })
 
 d3.select("body").on('keydown', (event) => {
@@ -239,6 +240,20 @@ function updateToolbarQueue() {
                 .attr("fill", "rgb(200,200,200)")
                 .attr("stroke", "black")
                 .attr("stroke-width", 3)
+        }
+
+        if (curclick[0] == "edge") {
+            elbox.append("path")
+                .attr("d", ["M 35 8 L 8 35"])
+                .attr("fill", "none")
+                .attr("stroke", "black")
+                .attr("stroke-width", 3)
+            elbox.append("circle")
+                .attr("cx", 35).attr("cy", 8).attr("r", 4)
+                .attr("fill", "black")
+            elbox.append("circle")
+                .attr("cx", 8).attr("cy", 35).attr("r", 4)
+                .attr("fill", "black")
         }
 
         elbox.append("animateMotion")
