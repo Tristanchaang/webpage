@@ -1,13 +1,9 @@
 function changeattr(shapelist,prop,val) {
-    for (let shape of shapelist) {
-        shape.attr(prop, val)
-    }
+    for (let shape of shapelist) shape.attr(prop, val);
 }
 
 function setattrs(shape, dict) {
-    for (let [prop, val] of Object.entries(dict)) {
-        shape.attr(prop, val)
-    }
+    for (let [prop, val] of Object.entries(dict)) shape.attr(prop, val);
 }
 
 function animate(func, duration, delay=0) {
@@ -17,9 +13,7 @@ function animate(func, duration, delay=0) {
         }, delay)
 }
 
-function nearestMultiple(num, mul) {
-    return Math.round(num/mul) * mul
-}
+function nearestMultiple(num, mul) {return Math.round(num/mul) * mul}
 
 let nodeisclicked = false;
 function nodeClicked(thisid) {
@@ -44,7 +38,6 @@ function findNode(coord) {
 }
 
 function pressed(key) {
-
     switch (key) {
         case "Enter": processInput(); break;
         case "Backspace": processDeletion(); break;
@@ -65,8 +58,7 @@ function closeTutorial() {
 }
 
 const offset = document.getElementById("toppart").offsetHeight;
-const space = d3.select("body");
-const svg = space.append("svg");
+const svg = d3.select("body").append("svg");
 setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight - offset});
 svg.append("div").attr("id", "divider");
 
@@ -80,17 +72,18 @@ animate((elapsed) => {
         "cy": 200+100*Math.sin(2*Math.PI*elapsed/1000)})
     }, 2000)
 
-nodelist = Object()
-adjlist = Object()
+nodelist = Object() // {[x,y]: d3objectrepresentation, ...}
+adjlist = Object() // {[x,y]: [[neighbours, ...], label], ...}
 
 class node {
     constructor(x, y, label) {
         this.coord = [x,y];
         this.label = label;
         
-        adjlist[[x,y,label]] = [];
+        adjlist[[x,y]] = [[], label];
 
-        nodelist[[x,y]] = svg.append("g")
+        nodelist[[x,y]] = svg.append("g");
+
         setattrs(nodelist[[x,y]], {
             "id": "node"+label,
             "onclick": "nodeClicked(this.id)",
@@ -104,6 +97,7 @@ class node {
             "stroke": "black",
             "stroke-width": 5,
         })
+        
 
         const nodelabel = nodelist[[x,y]].append("text")
         nodelabel.text(String(label))
@@ -129,9 +123,9 @@ class edge {
 
         const thisedge = svg.insert("path", "#divider");
         
-        adjlist[node1].push([node2, thisedge]);
+        adjlist[node1][0].push([node2, thisedge]);
 
-        if (!arrow) {adjlist[node2].push([node1, thisedge])};
+        if (!arrow) {adjlist[node2][0].push([node1, thisedge])};
 
         const midpoint = midPoint(node1.slice(0,2), node2.slice(0,2))
 
@@ -173,6 +167,15 @@ let autonodenumber = 1
 
 function processInput() {
     if (clickqueue.length === 1 && clickqueue[0][2] === "empty") {
+        if (inputstatus) {
+            new node(clickqueue[0][0], clickqueue[0][1], inputstatus);
+        } else {
+            new node(clickqueue[0][0], clickqueue[0][1], autonodenumber);
+            autonodenumber += 1;
+        }
+    }
+
+    if (clickqueue.length === 1 && clickqueue[0][2] === "node") {
         if (inputstatus) {
             new node(clickqueue[0][0], clickqueue[0][1], inputstatus);
         } else {
@@ -233,9 +236,23 @@ function updateToolbarQueue() {
     }
 }
 
-const N = 20;
+const N = 5;
 
 for (let i = 0; i < N; i++) {
     new node(200 + 100 * Math.sin(2 * Math.PI * i / N), 
     200 - 100 * Math.cos(2 * Math.PI * i / N), "a"+String(i))
 }
+
+
+// animate(()=>{
+//     for (const curnode of nodelist) {
+//         // animation
+//         d3.selectAll("circle").append("animate")
+//             .attr("attributeName","r")
+//             .attr("begin","0s")
+//             .attr("dur","3s")
+//             .attr("from","25")
+//             .attr("to","30")
+//             .attr("repeatCount","indefinite")
+//     }
+// }, "6s", 0)
