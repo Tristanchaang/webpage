@@ -73,11 +73,11 @@ function closeTutorial() {
     d3.select("#overlay").attr("class", "")
 }
 
-const offset = 53
-const space = d3.select("body")
-const svg = space.append("svg")
-setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight - offset})
-svg.append("div").attr("id", "divider")
+const offset = document.getElementById("toppart").offsetHeight;
+const space = d3.select("body");
+const svg = space.append("svg");
+setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight - offset});
+svg.append("div").attr("id", "divider");
 
 const circle = svg.append("circle")
 

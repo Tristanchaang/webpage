@@ -15,16 +15,19 @@
 
 <body style="margin:0;overflow:0;">
 <link rel="stylesheet" href="css/graph.css">
-<br>
-<div id="toolbar">&nbsp;&nbsp;
-    <button onclick="enterPressed()" style="padding: 8px 50px; background-color: greenyellow;">Enter</button>
-    <button onclick="escPressed()" style="padding: 8px 30px; background-color: pink;">Esc</button>
-    <button onclick="delPressed()" style="padding: 8px 30px; background-color: pink;">Del</button>
-    <button onclick="helpPressed()" style="padding: 8px 50px; background-color: yellow;">How to Use?</button>
-    <div id="clickqueue" style="float: right;"></div>
+<div id="toppart">
+    <br>
+    <div id="toolbar">&nbsp;&nbsp;
+        <button onclick="enterPressed()" style="padding: 8px 50px; background-color: greenyellow;">Enter</button>
+        <button onclick="escPressed()" style="padding: 8px 30px; background-color: pink;">Esc</button>
+        <button onclick="delPressed()" style="padding: 8px 30px; background-color: pink;">Del</button>
+        <button onclick="helpPressed()" style="padding: 8px 50px; background-color: yellow;">How to Use?</button>
+        <div id="clickqueue" style="float: right;"></div>
+    </div>
 </div>
 
 <div id="tutorial" class="">
+    
     <div id="tutorial-header" style="font-size: 1.25rem; font-weight: bold; background-color:lightgray;">
         How to Use
         <button onclick="closeTutorial()" style="float: right; cursor: pointer;">&times;</button>
