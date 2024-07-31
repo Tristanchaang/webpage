@@ -58,7 +58,7 @@ function closeTutorial() {
 }
 
 const offset = document.getElementById("toppart").offsetHeight;
-const svg = d3.select("body").append("svg");
+const svg = d3.select("body").insert("svg", "#tutorial");
 setattrs(svg, {
     'width': window.innerWidth, 
     'height': window.innerHeight - offset,
@@ -160,14 +160,17 @@ d3.select("body").on('keydown', (event) => {
 let autonodenumber = 1
 
 function processInput() {
-    if (clickqueue.length === 1 && clickqueue[0][2] === "empty") {
-        let nodename;
-        if (inputstatus) {
-            nodename = inputstatus;
-        } else {
-            nodename = autonodenumber++;
+
+    for (let queueEl of clickqueue) {
+        if (queueEl[2] === "empty") {
+            let nodename;
+            if (inputstatus) {
+                nodename = inputstatus;
+            } else {
+                nodename = autonodenumber++;
+            }
+            new node(queueEl[0], queueEl[1], nodename);
         }
-        new node(clickqueue[0][0], clickqueue[0][1], nodename);
     }
 
     if (clickqueue.length === 1 && clickqueue[0][2] === "node") {
@@ -182,8 +185,11 @@ function processInput() {
         adjlist[[clickqueue[0][0], clickqueue[0][1]]][1] = nodename;
     }
 
-    if (clickqueue.length === 2) {
-        new edge(clickqueue[0].slice(0,2), clickqueue[1].slice(0,2), inputstatus);
+    if (clickqueue.length > 1) {
+        for (let i=0; i<clickqueue.length-1; i++) {
+            if (Object.keys(nodelist).includes(String(clickqueue[i].slice(0,2))) && Object.keys(nodelist).includes(String(clickqueue[i+1].slice(0,2)))) {
+                new edge(clickqueue[i].slice(0,2), clickqueue[i+1].slice(0,2), inputstatus)}
+        }
     }
 }
 
