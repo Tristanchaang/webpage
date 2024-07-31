@@ -59,3 +59,14 @@ button:hover {
     pointer-events: all;
 }
 
+#clickqueue {
+    position: relative; /* Ensure the element is positioned relative for the animation to work */
+    transform: translateX(43px);
+    animation: moveRight 0.2s forwards;
+}
+
+@keyframes moveRight {
+    100% {
+      transform: translateX(0px);
+    }
+  }

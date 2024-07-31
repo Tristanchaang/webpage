@@ -221,16 +221,26 @@ function updateToolbarQueue() {
                 .attr("fill", "rgb(200,200,200)")
                 .attr("stroke", "black")
                 .attr("stroke-width", 3)
-            
         }
+
+        elbox.append("animateMotion")
+            .attr("path", "m43,0 l -43,0")
+            .attr("begin","0s")
+            .attr("dur", "0.2s")
+            .attr("repeatCount", 1)
     }
 }
 
-const N = 5;
+const N = 5, M = 10;
 
 for (let i = 0; i < N; i++) {
     new node(200 + 100 * Math.sin(2 * Math.PI * i / N), 
     200 - 100 * Math.cos(2 * Math.PI * i / N), "a"+String(i))
+}
+
+for (let i = 0; i < M; i++) {
+    new node(200 + 100 * Math.sin(2 * Math.PI * i / M), 
+    500 - 100 * Math.cos(2 * Math.PI * i / M), "b"+String(i))
 }
 
 animate(0, Infinity,
