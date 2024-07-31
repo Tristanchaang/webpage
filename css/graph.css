@@ -33,7 +33,7 @@ button {
 
 #tutorial-body {
     position: fixed;
-    padding: 15px 15px;
+    padding: 10px 15px;
     top: 56px;
     bottom: 0px;
     overflow: scroll;
