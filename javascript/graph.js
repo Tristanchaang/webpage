@@ -169,22 +169,21 @@ svg.on('click', (event) => {
 
 d3.select("body").on('keydown', (event) => {
     
-    if (event.key === "Enter") {
-        enterPressed();
-    } else if (event.key === "Escape") {
-        escPressed();
-    } else if (event.key === "Backspace") {
-        delPressed();
-    } else {
-        inputstatus += event.key
+    switch (event.key) {
+        case "Enter": enterPressed(); break;
+        case "Escape": escPressed(); break;
+        case "Backspace": delPressed(); break;
+        case "Shift": break;
+        default: inputstatus += event.key;
     }
+
     console.log(inputstatus)
 })
 
 let autonodenumber = 1
 
 function processInput() {
-    if (clickqueue.length === 1) {
+    if (clickqueue.length === 1 && clickqueue[0][2] === "empty") {
         if (inputstatus) {
             new node(clickqueue[0][0], clickqueue[0][1], inputstatus);
         } else {
@@ -245,7 +244,7 @@ function updateToolbarQueue() {
     }
 }
 
-const N = 10;
+const N = 20;
 
 for (let i = 0; i < N; i++) {
     new node(200 + 100 * Math.sin(2 * Math.PI * i / N), 
