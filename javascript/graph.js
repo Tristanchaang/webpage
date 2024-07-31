@@ -19,7 +19,15 @@ let nodeisclicked = false;
 function nodeClicked(thisid) {
     // console.log("Node Selected: " + thisid)
     const findhtml = d3.select("#"+thisid).select("circle");
-    clickqueue.push([Number(findhtml.attr("cx")),Number(findhtml.attr("cy")),"node"])
+    clickqueue.push(["node",Number(findhtml.attr("cx")),Number(findhtml.attr("cy"))])
+    nodeisclicked = true;
+}
+
+let edgeisclicked = false;
+function edgeClicked(thisid) {
+    // console.log("Node Selected: " + thisid)
+    const findhtml = d3.select("#"+thisid).select("circle");
+    clickqueue.push(["edge",Number(findhtml.attr("cx")),Number(findhtml.attr("cy"))])
     nodeisclicked = true;
 }
 
@@ -28,14 +36,6 @@ function midPoint(coord1,coord2) {
     (Number(coord1[1]) + Number(coord2[1]))/2];
 }
 
-function findNode(coord) {
-    for (let curnode of Object.keys(adjlist)) {
-        curnode = curnode.split(",")
-        if (curnode[0] == coord[0] && curnode[1] == coord[1]) {
-            return curnode;
-        }
-    }
-}
 
 function pressed(key) {
     switch (key) {
@@ -79,7 +79,7 @@ class node {
         nodelist[[x,y]] = svg.append("g");
 
         setattrs(nodelist[[x,y]], {
-            "id": "node"+label,
+            "id": "node-"+String(x)+"-"+String(y),
             "onclick": "nodeClicked(this.id)",
             "style": "cursor: pointer;"
         })
@@ -115,7 +115,10 @@ class edge {
         this.weight = weight;
         this.bend = bend;
 
-        const thisedge = svg.insert("path", "#divider");
+        const thisedge = svg.insert("g", "#divider")
+                            .attr("id", "edge-"+String(node1[0])+"-"+String(node1[1])+"-"+String(node2[0])+"-"+String(node2[1]))
+                            .attr("onclick", "edgeClicked()")
+                            .attr("style", "cursor: pointer;")
         
         adjlist[node1][0].push([node2, thisedge]);
 
@@ -123,7 +126,8 @@ class edge {
 
         const midpoint = midPoint(node1.slice(0,2), node2.slice(0,2))
 
-        setattrs(thisedge, {
+
+        setattrs(thisedge.append("path"), {
             "style": "fill:none; stroke:black; stroke-width:5;",
             "d": "M " + node1[0] + " " + node1[1] 
             + " Q " + midpoint[0] + " " + midpoint[1] 
@@ -138,7 +142,7 @@ let inputstatus = "";
 
 svg.on('click', (event) => {
     if (!nodeisclicked) {
-        clickqueue.push([nearestMultiple(event.x,50), nearestMultiple(event.y-offset,50), "empty"])
+        clickqueue.push(["empty",nearestMultiple(event.x,50), nearestMultiple(event.y-offset,50)])
     }
     nodeisclicked = false;
 
@@ -162,39 +166,41 @@ let autonodenumber = 1
 function processInput() {
 
     for (let queueEl of clickqueue) {
-        if (queueEl[2] === "empty") {
+        if (queueEl[0] === "empty") {
             let nodename;
             if (inputstatus) {
                 nodename = inputstatus;
             } else {
                 nodename = autonodenumber++;
             }
-            new node(queueEl[0], queueEl[1], nodename);
+            new node(queueEl[1], queueEl[2], nodename);
         }
     }
 
-    if (clickqueue.length === 1 && clickqueue[0][2] === "node") {
+    if (clickqueue.length === 1 && clickqueue[0][0] === "node") {
         let nodename;
         if (inputstatus) {
             nodename = inputstatus;
         } else {
             nodename = autonodenumber++;
         }
-        const orilabel = adjlist[[clickqueue[0][0], clickqueue[0][1]]][1];
+        const orilabel = adjlist[[clickqueue[0][1], clickqueue[0][2]]][1];
         d3.select("#node"+orilabel).select("text").text(nodename);
-        adjlist[[clickqueue[0][0], clickqueue[0][1]]][1] = nodename;
+        adjlist[[clickqueue[0][1], clickqueue[0][2]]][1] = nodename;
     }
 
     if (clickqueue.length > 1) {
         for (let i=0; i<clickqueue.length-1; i++) {
-            if (Object.keys(nodelist).includes(String(clickqueue[i].slice(0,2))) && Object.keys(nodelist).includes(String(clickqueue[i+1].slice(0,2)))) {
-                new edge(clickqueue[i].slice(0,2), clickqueue[i+1].slice(0,2), inputstatus)}
+            if (clickqueue[i][0] === "node" && clickqueue[i+1][0] === "node") {
+                new edge(clickqueue[i].slice(1,3), clickqueue[i+1].slice(1,3), inputstatus)}
         }
     }
 }
 
 function processDeletion() {
-    console.log("To be removed..")
+    for (const curobj of clickqueue) {
+        d3.select("#"+"node-"+String(curobj[1])+"-"+String(curobj[2])).remove()
+    }
 }
 
 function updateToolbarQueue() {
@@ -212,7 +218,7 @@ function updateToolbarQueue() {
                             .attr("height", 43).attr("width", 43)
                             .attr("style", "float: right; margin: 0;")
 
-        if (curclick[2] == "empty") {
+        if (curclick[0] == "empty") {
             for (const drawpath of ["M 16 6 L 6 6 L 6 16", "M 27 37 L 37 37 L 37 27", "M 27 6 L 37 6 L 37 16", "M 6 27 L 6 37 L 16 37"]) {
                 elbox.append("path")
                     .attr("d", drawpath)
@@ -222,7 +228,7 @@ function updateToolbarQueue() {
             }
         }
 
-        if (curclick[2] == "node") {
+        if (curclick[0] == "node") {
             elbox.append("path")
                 .attr("d", ["M 37 6 L 6 37"])
                 .attr("fill", "none")
@@ -246,13 +252,13 @@ function updateToolbarQueue() {
 const N = 5, M = 10;
 
 for (let i = 0; i < N; i++) {
-    new node(200 + 100 * Math.sin(2 * Math.PI * i / N), 
-    200 - 100 * Math.cos(2 * Math.PI * i / N), "a"+String(i))
+    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
+    Math.round(200 - 100 * Math.cos(2 * Math.PI * i / N)), "a"+String(i))
 }
 
 for (let i = 0; i < M; i++) {
-    new node(200 + 100 * Math.sin(2 * Math.PI * i / M), 
-    500 - 100 * Math.cos(2 * Math.PI * i / M), "b"+String(i))
+    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / M)), 
+    Math.round(500 - 100 * Math.cos(2 * Math.PI * i / M)), "b"+String(i))
 }
 
 animate(0, Infinity,
