@@ -23,7 +23,7 @@ function nearestMultiple(num, mul) {
 
 let nodeisclicked = false;
 function nodeClicked(thisid) {
-    console.log("Node Selected: " + thisid)
+    // console.log("Node Selected: " + thisid)
     const findhtml = d3.select("#"+thisid).select("circle");
     clickqueue.push([Number(findhtml.attr("cx")),Number(findhtml.attr("cy")),"node"])
     nodeisclicked = true;
@@ -43,21 +43,12 @@ function findNode(coord) {
     }
 }
 
-function enterPressed() {
-    processInput();
-    inputstatus = "";
-    clickqueue = [];
-    updateToolbarQueue();
-}
+function pressed(key) {
 
-function escPressed() {
-    inputstatus = "";
-    clickqueue = [];
-    updateToolbarQueue();
-}
-
-function delPressed() {
-    processDeletion();
+    switch (key) {
+        case "Enter": processInput(); break;
+        case "Backspace": processDeletion(); break;
+    }
     inputstatus = "";
     clickqueue = [];
     updateToolbarQueue();
@@ -164,20 +155,18 @@ svg.on('click', (event) => {
     nodeisclicked = false;
 
     updateToolbarQueue();
-    console.log(clickqueue)
+    // console.log(clickqueue)
 })
 
 d3.select("body").on('keydown', (event) => {
-    
-    switch (event.key) {
-        case "Enter": enterPressed(); break;
-        case "Escape": escPressed(); break;
-        case "Backspace": delPressed(); break;
-        case "Shift": break;
-        default: inputstatus += event.key;
+
+    if (["Enter", "Escape", "Backspace", "Shift"].includes(event.key)) {
+        pressed(event.key);
+    } else {
+        inputstatus += event.key;
     }
 
-    console.log(inputstatus)
+    // console.log(inputstatus)
 })
 
 let autonodenumber = 1
