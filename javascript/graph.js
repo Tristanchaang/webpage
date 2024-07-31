@@ -6,7 +6,7 @@ function setattrs(shape, dict) {
     for (let [prop, val] of Object.entries(dict)) shape.attr(prop, val);
 }
 
-function animate(func, duration, delay=0) {
+function animate(delay, duration, func) {
     let t = d3.timer((elapsed) => {
         func(elapsed);
         if (elapsed >= duration) {t.stop();}
@@ -62,16 +62,6 @@ const svg = d3.select("body").append("svg");
 setattrs(svg, {'width': window.innerWidth, 'height': window.innerHeight - offset});
 svg.append("div").attr("id", "divider");
 
-const circle = svg.append("circle")
-
-setattrs(circle, {"r": 40, "fill": "red"})
-
-animate((elapsed) => {
-    setattrs(circle, {
-        "cx": 800+100*Math.cos(2*Math.PI*elapsed/1000), 
-        "cy": 200+100*Math.sin(2*Math.PI*elapsed/1000)})
-    }, 2000)
-
 nodelist = Object() // {[x,y]: d3objectrepresentation, ...}
 adjlist = Object() // {[x,y]: [[neighbours, ...], label], ...}
 
@@ -96,9 +86,9 @@ class node {
             "fill": "rgb(200,200,200)", 
             "stroke": "black",
             "stroke-width": 5,
+            "class": "nodecircle"
         })
         
-
         const nodelabel = nodelist[[x,y]].append("text")
         nodelabel.text(String(label))
         setattrs(nodelabel, {
@@ -192,7 +182,7 @@ function processInput() {
 }
 
 function processDeletion() {
-    
+    console.log("To be removed..")
 }
 
 function updateToolbarQueue() {
@@ -243,16 +233,10 @@ for (let i = 0; i < N; i++) {
     200 - 100 * Math.cos(2 * Math.PI * i / N), "a"+String(i))
 }
 
+animate(0, Infinity,
+    (elapsed) => {
+        d3.selectAll(".nodecircle")
+            .attr("r",25 + 3*Math.sin(elapsed/500))
+    }
+)
 
-// animate(()=>{
-//     for (const curnode of nodelist) {
-//         // animation
-//         d3.selectAll("circle").append("animate")
-//             .attr("attributeName","r")
-//             .attr("begin","0s")
-//             .attr("dur","3s")
-//             .attr("from","25")
-//             .attr("to","30")
-//             .attr("repeatCount","indefinite")
-//     }
-// }, "6s", 0)
