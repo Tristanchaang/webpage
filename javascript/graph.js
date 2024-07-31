@@ -161,21 +161,25 @@ let autonodenumber = 1
 
 function processInput() {
     if (clickqueue.length === 1 && clickqueue[0][2] === "empty") {
+        let nodename;
         if (inputstatus) {
-            new node(clickqueue[0][0], clickqueue[0][1], inputstatus);
+            nodename = inputstatus;
         } else {
-            new node(clickqueue[0][0], clickqueue[0][1], autonodenumber);
-            autonodenumber += 1;
+            nodename = autonodenumber++;
         }
+        new node(clickqueue[0][0], clickqueue[0][1], nodename);
     }
 
     if (clickqueue.length === 1 && clickqueue[0][2] === "node") {
+        let nodename;
         if (inputstatus) {
-            new node(clickqueue[0][0], clickqueue[0][1], inputstatus);
+            nodename = inputstatus;
         } else {
-            new node(clickqueue[0][0], clickqueue[0][1], autonodenumber);
-            autonodenumber += 1;
+            nodename = autonodenumber++;
         }
+        const orilabel = adjlist[[clickqueue[0][0], clickqueue[0][1]]][1];
+        d3.select("#node"+orilabel).select("text").text(nodename);
+        adjlist[[clickqueue[0][0], clickqueue[0][1]]][1] = nodename;
     }
 
     if (clickqueue.length === 2) {
