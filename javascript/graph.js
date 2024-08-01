@@ -73,12 +73,12 @@ class node {
         this.coord = [x,y];
         this.label = label;
         
-        adjlist[[x,y]] = [[], label];
+        adjlist[["node",x,y]] = [[], label];
 
         const shapegroup = svg.append("g");
 
         setattrs(shapegroup, {
-            "id": "node-"+String(x)+"-"+String(y),
+            "id": "node-"+[x,y].join("-"),
             "onclick": "nodeClicked(this.id)",
             "style": "cursor: pointer;"
         })
@@ -107,15 +107,13 @@ class node {
 
 class edge {
     constructor(node1, node2, label, arrow=false, weight=0, bend=0) {
-        this.start = node1;
-        this.end = node2;
         this.label = label;
         this.arrow = arrow;
         this.weight = weight;
         this.bend = bend;
 
         const thisedge = svg.insert("g", "#divider")
-                            .attr("id", "edge-"+String(node1[0])+"-"+String(node1[1])+"-"+String(node2[0])+"-"+String(node2[1]))
+                            .attr("id", "edge-"+node1.slice(1,3).join("-")+"-"+node2.slice(1,3).join("-"))
                             .attr("onclick", "edgeClicked(this.id)")
                             .attr("style", "cursor: pointer;")
         
@@ -123,14 +121,14 @@ class edge {
 
         if (!arrow) {adjlist[node2][0].push([node1, thisedge])};
 
-        const midpoint = midPoint(node1.slice(0,2), node2.slice(0,2))
+        const midpoint = midPoint(node1.slice(1,3), node2.slice(1,3))
 
 
         setattrs(thisedge.append("path"), {
             "style": "fill:none; stroke:black; stroke-width:10;",
-            "d": "M " + node1[0] + " " + node1[1] 
+            "d": "M " + node1[1] + " " + node1[2] 
             + " Q " + midpoint[0] + " " + midpoint[1] 
-            + " " + node2[0] + " " + node2[1] 
+            + " " + node2[1] + " " + node2[2] 
             + "",
             "class": "edgepath"
         })
@@ -153,7 +151,7 @@ svg.on('click', (event) => {
 
 d3.select("body").on('keydown', (event) => {
 
-    if (["Enter", "Escape", "Backspace", "Shift"].includes(event.key)) {
+    if (["Enter", "Escape", "Backspace", "Shift", "Control"].includes(event.key)) {
         pressed(event.key);
     } else {
         inputstatus += event.key;
@@ -185,26 +183,24 @@ function processInput() {
         } else {
             nodename = autonodenumber++;
         }
-        d3.select("#node-"+String(clickqueue[0][1])+"-"+String(clickqueue[0][2])).select("text").text(nodename);
+        d3.select("#"+clickqueue[0].join("-")).select("text").text(nodename);
         adjlist[[clickqueue[0][1], clickqueue[0][2]]][1] = nodename;
     }
 
     if (clickqueue.length > 1) {
         for (let i=0; i<clickqueue.length-1; i++) {
             if (clickqueue[i][0] === "node" && clickqueue[i+1][0] === "node") {
-                new edge(clickqueue[i].slice(1,3), clickqueue[i+1].slice(1,3), inputstatus)}
+                new edge(clickqueue[i], clickqueue[i+1], inputstatus)}
         }
     }
+
+    // for (const thing of Object.keys(adjlist)) {console.log(thing,adjlist[thing]);}
 }
 
 function processDeletion() {
     for (const curobj of clickqueue) {
-        switch (curobj[0]) {
-            case "node":
-                d3.select("#"+"node-"+String(curobj[1])+"-"+String(curobj[2])).remove(); break;
-            case "edge":
-                d3.select("#"+"edge-"+String(curobj[1])+"-"+String(curobj[2])+"-"+String(curobj[3])+"-"+String(curobj[4])).remove(); break;
-        }
+        
+        d3.select("#"+curobj.join("-")).remove();
         }
 }
 
