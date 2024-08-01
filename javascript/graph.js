@@ -302,12 +302,27 @@ for (let i = 0; i < M; i++) {
     Math.round(500 - 100 * Math.cos(2 * Math.PI * i / M)), "b"+String(i))
 }
 
+let breathing = true;
+
+function toggleBreathing() {
+    breathing = !breathing;
+    d3.select("#toggleBreathing")
+        .attr("style", "background-color: "+(breathing ? "greenyellow" : "pink")+";")
+        .text(breathing ? "On" : "Off");
+}
+
 animate(0, Infinity,
     (elapsed) => {
-        d3.selectAll(".nodecircle")
-            .attr("r",25 + 3*Math.sin(elapsed/500));
-        d3.selectAll(".edgepath")
-            .attr("style", "fill: none; stroke: black; stroke-width: " + (10 + 2*Math.sin(elapsed/500)) + ";")
-        
+        if (breathing) {
+            d3.selectAll(".nodecircle")
+                .attr("r",25 + 3*Math.sin(elapsed/500));
+            d3.selectAll(".edgepath")
+                .attr("style", "fill: none; stroke: black; stroke-width: " + (10 + 2*Math.sin(elapsed/500)) + ";")
+        } else {
+            d3.selectAll(".nodecircle")
+                .attr("r",25);
+            d3.selectAll(".edgepath")
+                .attr("style", "fill: none; stroke: black; stroke-width: 10;")
+        }
     }
 )

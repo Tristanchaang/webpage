@@ -20,10 +20,20 @@
 
 .toggler {
     background-color: pink;
-    height: 20px;
+    height: 3em;
+    width: 3em;
+    font-weight: bold;
+    align-items: center;
+    cursor: pointer;
 }
+
 .toggler.active {
     background-color: greenyellow;
+}
+
+.settings-el {
+    width: 10em;
+    display: inline-block;
 }
 
 #tutorial, #settings {
@@ -59,6 +69,7 @@
     top: 56px;
     bottom: 0px;
     overflow: scroll;
+    font-size: large;
 }
 
 #overlay {
