@@ -66,7 +66,6 @@ setattrs(svg, {
 });
 svg.append("div").attr("id", "divider");
 
-nodelist = Object() // {[x,y]: d3objectrepresentation, ...}
 adjlist = Object() // {[x,y]: [[neighbours, ...], label], ...}
 
 class node {
@@ -76,15 +75,15 @@ class node {
         
         adjlist[[x,y]] = [[], label];
 
-        nodelist[[x,y]] = svg.append("g");
+        const shapegroup = svg.append("g");
 
-        setattrs(nodelist[[x,y]], {
+        setattrs(shapegroup, {
             "id": "node-"+String(x)+"-"+String(y),
             "onclick": "nodeClicked(this.id)",
             "style": "cursor: pointer;"
         })
 
-        const nodecirc = nodelist[[x,y]].append("circle")
+        const nodecirc = shapegroup.append("circle")
         setattrs(nodecirc, {
             "cx": x, "cy": y, "r": 25, 
             "fill": "rgb(200,200,200)", 
@@ -93,7 +92,7 @@ class node {
             "class": "nodecircle"
         })
         
-        const nodelabel = nodelist[[x,y]].append("text")
+        const nodelabel = shapegroup.append("text")
         nodelabel.text(String(label))
         setattrs(nodelabel, {
             "x": x, "y": y,

@@ -67,6 +67,13 @@ button:hover {
     animation: moveRight 0.2s forwards;
 }
 
+#inputstatusbox {
+    right: 0px;
+    left: 90%;
+    top: 90%;
+    bottom: 0px;
+}
+
 @keyframes moveRight {
     100% {
       transform: translateX(0px);
