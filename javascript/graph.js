@@ -128,7 +128,7 @@ class edge {
 
 
         setattrs(thisedge.append("path"), {
-            "style": "fill:none; stroke:black; stroke-width:5;",
+            "style": "fill:none; stroke:black; stroke-width:10;",
             "d": "M " + node1[0] + " " + node1[1] 
             + " Q " + midpoint[0] + " " + midpoint[1] 
             + " " + node2[0] + " " + node2[1] 
@@ -200,8 +200,13 @@ function processInput() {
 
 function processDeletion() {
     for (const curobj of clickqueue) {
-        d3.select("#"+"node-"+String(curobj[1])+"-"+String(curobj[2])).remove()
-    }
+        switch (curobj[0]) {
+            case "node":
+                d3.select("#"+"node-"+String(curobj[1])+"-"+String(curobj[2])).remove(); break;
+            case "edge":
+                d3.select("#"+"edge-"+String(curobj[1])+"-"+String(curobj[2])+"-"+String(curobj[3])+"-"+String(curobj[4])).remove(); break;
+        }
+        }
 }
 
 function updateToolbarQueue() {
