@@ -106,7 +106,7 @@ class node {
 }
 
 class edge {
-    constructor(node1, node2, label, arrow=true, weight=0, bend=0) {
+    constructor(node1, node2, label, arrow=false, weight=0, bend=0) {
         this.start = node1;
         this.end = node2;
         this.label = label;
@@ -132,6 +132,7 @@ class edge {
             + " Q " + midpoint[0] + " " + midpoint[1] 
             + " " + node2[0] + " " + node2[1] 
             + "",
+            "class": "edgepath"
         })
     }
 }
@@ -158,7 +159,7 @@ d3.select("body").on('keydown', (event) => {
         inputstatus += event.key;
     }
 
-    // console.log(inputstatus)
+    d3.select("#inputstatusbox").text(inputstatus)
 })
 
 let autonodenumber = 1
@@ -267,7 +268,8 @@ function updateToolbarQueue() {
     }
 }
 
-const N = 5, M = 10;
+const N = 5, M = 7;
+
 
 for (let i = 0; i < N; i++) {
     new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
@@ -282,7 +284,10 @@ for (let i = 0; i < M; i++) {
 animate(0, Infinity,
     (elapsed) => {
         d3.selectAll(".nodecircle")
-            .attr("r",25 + 3*Math.sin(elapsed/500))
+            .attr("r",25 + 3*Math.sin(elapsed/500));
+        d3.selectAll(".edgepath")
+            .attr("style", "fill: none; stroke: black; stroke-width: " + (10 + 2*Math.sin(elapsed/500)) + ";")
+        
     }
 )
 
