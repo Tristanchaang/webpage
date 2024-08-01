@@ -1,14 +1,32 @@
-button {
+.toolbutton {
     font-size: 20px; 
     font-weight: bold;
     cursor: pointer;
+    padding: 8px 30px;
 }
 
-button:hover {
+.toolbutton:hover {
     box-shadow: 0px 0px 2px 2px lightgray;
 }
 
-#tutorial {
+.closebutton {
+    float: right; 
+    cursor: pointer; 
+    font-size: x-large; 
+    background: none; 
+    border: none; 
+    font-weight: bold;
+}
+
+.toggler {
+    background-color: pink;
+    height: 20px;
+}
+.toggler.active {
+    background-color: greenyellow;
+}
+
+#tutorial, #settings {
     position: fixed;
     top: 100px;
     left: 200px;
@@ -22,11 +40,11 @@ button:hover {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-#tutorial.active {
+#tutorial.active, #settings.active {
     transform: scale(1);
 }
 
-#tutorial-header {
+#tutorial-header, #settings-header {
     padding: 10px 15px;
     height: 35px;
     display: flex;
@@ -35,7 +53,7 @@ button:hover {
     border-bottom: 1px solid black;
 }
 
-#tutorial-body {
+#tutorial-body, #settings-body {
     position: fixed;
     padding: 10px 15px;
     top: 56px;

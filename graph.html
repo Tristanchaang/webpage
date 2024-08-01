@@ -18,19 +18,20 @@
 <div id="toppart">
     <br>
     <div id="toolbar" style="overflow:hidden;">&nbsp;&nbsp;
-        <button onclick="pressed('Enter')" style="padding: 8px 50px; background-color: greenyellow;">Enter</button>
-        <button onclick="pressed('Escape')" style="padding: 8px 30px; background-color: pink;">Esc</button>
-        <button onclick="pressed('Backspace')" style="padding: 8px 30px; background-color: pink;">Del</button>
-        <button onclick="helpPressed()" style="padding: 8px 50px; background-color: yellow;">How to Use?</button>
+        <button class="toolbutton" onclick="pressed('Enter')" style="background-color: greenyellow;">Enter</button>
+        <button class="toolbutton" onclick="pressed('Escape')" style="background-color: pink;">Esc</button>
+        <button class="toolbutton" onclick="pressed('Backspace')" style="background-color: pink;">Del</button>
+        <button class="toolbutton" onclick="helpPressed()" style=" background-color: yellow;">How to Use?</button>
+        <button class="toolbutton" onclick="settingsPressed()" style=" background-color: orange;">Settings</button>
         <div id="clickqueue" style="float: right;"></div>
     </div>
 </div>
 
 <div id="tutorial" class="">
     
-    <div id="tutorial-header" style="font-size: 1.25rem; font-weight: bold; background-color:lightgray;">
+    <div id="tutorial-header" style="font-size: 1.25rem; font-weight: bold; background-color:lightyellow;">
         How to Use
-        <button onclick="closeTutorial()" style="float: right; cursor: pointer;">&times;</button>
+        <button onclick="closeTutorial()" class="closebutton">&times;</button>
     </div>
 
     <div id="tutorial-body">
@@ -70,6 +71,25 @@
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati quo sequi id libero sit officia iusto, ut ducimus vitae dolores, delectus, vero ipsum odio distinctio nostrum aliquam cum saepe eos. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Saepe quidem tempora delectus voluptates quia similique! Doloribus quisquam nihil ducimus nam, perferendis, laboriosam alias sint, veritatis fuga illum saepe neque rerum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore repellat ea cum voluptates dicta incidunt? Laudantium, obcaecati sint. Enim sint ipsam et, recusandae incidunt inventore porro accusantium officia minima placeat!Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati quo sequi id libero sit officia iusto, ut ducimus vitae dolores, delectus, vero ipsum odio distinctio nostrum aliquam cum saepe eos. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Saepe quidem tempora delectus voluptates quia similique! Doloribus quisquam nihil ducimus nam, perferendis, laboriosam alias sint, veritatis fuga illum saepe neque rerum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore repellat ea cum voluptates dicta incidunt? Laudantium, obcaecati sint. Enim sint ipsam et, recusandae incidunt inventore porro accusantium officia minima placeat!
     </div>
 </div>
+
+
+<div id="settings" class="">
+    
+    <div id="settings-header" style="font-size: 1.25rem; font-weight: bold; background-color:peachpuff;">
+        Settings
+        <button onclick="closeSettings()" class="closebutton">&times;</button>
+    </div>
+
+    <div id="settings-body">
+
+        Breathing effect: &nbsp;&nbsp; <button class="toggler"> </button>
+
+        <br><br>
+
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aperiam temporibus voluptatem, sapiente nihil inventore eligendi esse aliquid nulla, ducimus itaque tempore non magnam. Adipisci veritatis debitis nesciunt sequi. Fugiat, eos. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolor beatae ut minima sit soluta expedita non repudiandae explicabo maxime nulla, officia perferendis ratione veniam quis et, id quibusdam nemo error? Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis velit ad recusandae reprehenderit, excepturi, amet praesentium iste officia eaque magnam fugiat quo! Blanditiis dicta qui, in repudiandae ad nesciunt sequi?
+    </div>
+</div>
+
 
 <div id="overlay" class=""></div>
 

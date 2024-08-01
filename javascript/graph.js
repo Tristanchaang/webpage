@@ -57,6 +57,16 @@ function closeTutorial() {
     d3.select("#overlay").attr("class", "")
 }
 
+function settingsPressed() {
+    d3.select("#settings").attr("class", "active")
+    d3.select("#overlay").attr("class", "active")
+}
+
+function closeSettings() {
+    d3.select("#settings").attr("class", "")
+    d3.select("#overlay").attr("class", "")
+}
+
 const offset = document.getElementById("toppart").offsetHeight;
 const svg = d3.select("body").insert("svg", "#tutorial");
 setattrs(svg, {
@@ -157,7 +167,7 @@ d3.select("body").on('keydown', (event) => {
         inputstatus += event.key;
     }
 
-    d3.select("#inputstatusbox").text(inputstatus)
+    d3.select("#inputstatusbox").text(inputstatus);
 })
 
 let autonodenumber = 1
@@ -184,7 +194,7 @@ function processInput() {
             nodename = autonodenumber++;
         }
         d3.select("#"+clickqueue[0].join("-")).select("text").text(nodename);
-        adjlist[[clickqueue[0][1], clickqueue[0][2]]][1] = nodename;
+        adjlist[clickqueue[0]][1] = nodename;
     }
 
     if (clickqueue.length > 1) {
@@ -194,19 +204,34 @@ function processInput() {
         }
     }
 
+    // console.log("adjlist:")
     // for (const thing of Object.keys(adjlist)) {console.log(thing,adjlist[thing]);}
 }
 
 function processDeletion() {
     for (const curobj of clickqueue) {
         
-        d3.select("#"+curobj.join("-")).remove();
+        if (curobj[0] === "node") {
+            for (const nbedge of adjlist[curobj][0]) {
+                nbedge[1].remove();
+            }
+            delete adjlist[curobj];
+
+            for (const nodetrip of Object.keys(adjlist)) {
+                adjlist[nodetrip][0] = adjlist[nodetrip][0].filter((nodeedge) => {
+                    return !(nodeedge[0].join("-") === curobj.join("-"))
+                })
+            }
         }
+
+        d3.select("#"+curobj.join("-")).remove();
+
+    }
 }
 
 function updateToolbarQueue() {
-    d3.select("#clickqueue").remove() // remove clickqueue element
-    queuebox = d3.select("#toolbar") // reinsert new clickqueue element
+    d3.select("#clickqueue").remove() // remove clickqueue html
+    queuebox = d3.select("#toolbar") // reinsert new clickqueue html
                 .append("div")
                 .attr("id", "clickqueue")
                 .attr("style", "float: right; margin: 0;")
@@ -264,7 +289,7 @@ function updateToolbarQueue() {
     }
 }
 
-const N = 5, M = 7;
+const N = 5, M = 8;
 
 
 for (let i = 0; i < N; i++) {
@@ -286,4 +311,3 @@ animate(0, Infinity,
         
     }
 )
-
