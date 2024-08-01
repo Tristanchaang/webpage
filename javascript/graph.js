@@ -185,8 +185,7 @@ function processInput() {
         } else {
             nodename = autonodenumber++;
         }
-        const orilabel = adjlist[[clickqueue[0][1], clickqueue[0][2]]][1];
-        d3.select("#node"+orilabel).select("text").text(nodename);
+        d3.select("#node-"+String(clickqueue[0][1])+"-"+String(clickqueue[0][2])).select("text").text(nodename);
         adjlist[[clickqueue[0][1], clickqueue[0][2]]][1] = nodename;
     }
 
