@@ -27,13 +27,23 @@
     cursor: pointer;
 }
 
-.toggler.active {
+.toggler.on {
     background-color: greenyellow;
 }
 
 .settings-el {
     width: 10em;
     display: inline-block;
+}
+
+.selector {
+    height: 3em;
+    width: 3em;
+    margin-right: 1em;
+}
+
+.selector.on {
+    border: 2px solid black;
 }
 
 #tutorial, #settings {

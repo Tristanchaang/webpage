@@ -78,6 +78,8 @@ svg.append("div").attr("id", "divider");
 
 adjlist = Object() // {[x,y]: [[neighbours, ...], label], ...}
 
+let nodeColor = 'rgb(200,200,200)';
+
 class node {
     constructor(x, y, label) {
         this.coord = [x,y];
@@ -96,7 +98,7 @@ class node {
         const nodecirc = shapegroup.append("circle")
         setattrs(nodecirc, {
             "cx": x, "cy": y, "r": 25, 
-            "fill": "rgb(200,200,200)", 
+            "fill": nodeColor, 
             "stroke": "black",
             "stroke-width": 5,
             "class": "nodecircle"
@@ -262,7 +264,7 @@ function updateToolbarQueue() {
                 .attr("stroke-width", 3)
             elbox.append("circle")
                 .attr("cx", 21.5).attr("cy", 21.5).attr("r", 15)
-                .attr("fill", "rgb(200,200,200)")
+                .attr("fill", nodeColor)
                 .attr("stroke", "black")
                 .attr("stroke-width", 3)
         }
@@ -307,9 +309,41 @@ let breathing = true;
 function toggleBreathing() {
     breathing = !breathing;
     d3.select("#toggleBreathing")
-        .attr("style", "background-color: "+(breathing ? "greenyellow" : "pink")+";")
+        .attr("class", "toggler "+(breathing ? "on" : "off"))
         .text(breathing ? "On" : "Off");
 }
+
+
+
+function setNodeColor(raw, color) {
+    d3.selectAll(".nodeColor").attr("class", "selector nodeColor off");
+    d3.select("#nodeColor-"+color).attr("class", "selector nodeColor on");
+    nodeColor = raw;
+    d3.selectAll(".nodecircle").style("fill", raw)
+}
+
+{/* <button style="background-color: rgb(200,200,200);" class="selector nodeColor on" id="nodeColor-gray" onclick="setNodeColor('gray')">&nbsp;</button> */}
+
+const nodeColorOptions = [
+    ["rgb(200,200,200)", "gray"],
+    ["pink", "pink"],
+    ["lightblue", "blue"],
+    ["lightgreen", "green"],
+    ["white", "white"]
+]
+
+for (const colorcolor of nodeColorOptions) {
+    d3.select("#nodeColorOptions")
+        .append("button")
+        .attr("style", "background-color: " + colorcolor[0] + ";")
+        .attr("class", "selector nodeColor off")
+        .attr("id", "nodeColor-"+colorcolor[1])
+        .attr("onclick", "setNodeColor('"+colorcolor[0]+"','"+colorcolor[1]+"')")
+        .text("\xa0")
+}
+
+d3.select("#nodeColor-gray").attr("class", "selector nodeColor on")
+
 
 animate(0, Infinity,
     (elapsed) => {
