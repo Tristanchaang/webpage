@@ -71,6 +71,7 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid black;
+    font-size: x-large;
 }
 
 #tutorial-body, #settings-body {
@@ -78,6 +79,8 @@
     padding: 10px 15px;
     top: 56px;
     bottom: 0px;
+    left: 0px;
+    right: 0px;
     overflow: scroll;
     font-size: large;
 }
@@ -110,7 +113,7 @@
     position: fixed;
     right: 0px;
     left: 0px;
-    top: calc(100% - 30px);
+    top: calc(100% - 35px);
     bottom: 0px;
     font-size: 25px;
     text-align: right;
