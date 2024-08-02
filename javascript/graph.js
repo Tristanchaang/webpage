@@ -31,9 +31,14 @@ function edgeClicked(thisid) {
     edgeisclicked = true;
 }
 
-function midPoint(coord1,coord2) {
-    return [(Number(coord1[0]) + Number(coord2[0]))/2, 
-    (Number(coord1[1]) + Number(coord2[1]))/2];
+function midPoint(coord1,coord2, bend = 0) {
+    [a,b] = coord1;
+    [c,d] = coord2;
+    a = Number(a);
+    b = Number(b);
+    c = Number(c);
+    d = Number(d);
+    return [0.5 *a + 0.01 *b*bend - 0.01* bend *d + 0.5* c, -0.01* a*bend + 0.01 *c*bend + 0.5*b + 0.5 *d]
 }
 
 
@@ -117,23 +122,23 @@ class node {
     }
 }
 
-class edge {
-    constructor(node1, node2, label, arrow=false, weight=0, bend=0) {
-        this.label = label;
-        this.arrow = arrow;
-        this.weight = weight;
-        this.bend = bend;
+let autoedgenumber = 1;
 
+class edge {
+    constructor(node1, node2, arrow=0, weight=0, bend=0) {
+
+        // edge representation: ["edge",x1,y1,x2,y2,label, arrow, w, b]
         const thisedge = svg.insert("g", "#divider")
-                            .attr("id", "edge-"+node1.slice(1,3).join("-")+"-"+node2.slice(1,3).join("-"))
+                            .attr("id", "edge-"+node1.slice(1,3).join("-")+"-"+node2.slice(1,3).join("-")+"-"+autoedgenumber+"-"+arrow+"-"+weight+"-"+bend)
                             .attr("onclick", "edgeClicked(this.id)")
                             .attr("style", "cursor: pointer;")
+        autoedgenumber++;
         
         adjlist[node1][0].push([node2, thisedge]);
 
-        if (!arrow) {adjlist[node2][0].push([node1, thisedge])};
+        if (arrow==0) {adjlist[node2][0].push([node1, thisedge])};
 
-        const midpoint = midPoint(node1.slice(1,3), node2.slice(1,3))
+        const midpoint = midPoint(node1.slice(1,3), node2.slice(1,3), bend)
 
 
         setattrs(thisedge.append("path"), {
@@ -200,9 +205,18 @@ function processInput() {
     }
 
     if (clickqueue.length > 1) {
+
+        let arrow=0, weight=0, bend=0;
+        for (const parsed of inputstatus.split(",")) {
+            if (parsed=="dir") arrow=1;
+            if (parsed.slice(0,2)=="w=") weight=Number(parsed.slice(2));
+            if (parsed.slice(0,2)=="b=") bend=Number(parsed.slice(2));
+        }
+
         for (let i=0; i<clickqueue.length-1; i++) {
             if (clickqueue[i][0] === "node" && clickqueue[i+1][0] === "node") {
-                new edge(clickqueue[i], clickqueue[i+1], inputstatus)}
+                new edge(clickqueue[i], clickqueue[i+1], arrow, weight, bend)
+            }
         }
     }
 
