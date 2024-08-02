@@ -110,7 +110,7 @@
     position: fixed;
     right: 0px;
     left: 0px;
-    top: 96%;
+    top: calc(100% - 30px);
     bottom: 0px;
     font-size: 25px;
     text-align: right;

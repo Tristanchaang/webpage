@@ -315,34 +315,34 @@ function toggleBreathing() {
 
 
 
-function setNodeColor(raw, color) {
+function setNodeColor(color) {
     d3.selectAll(".nodeColor").attr("class", "selector nodeColor off");
     d3.select("#nodeColor-"+color).attr("class", "selector nodeColor on");
-    nodeColor = raw;
-    d3.selectAll(".nodecircle").style("fill", raw)
+    nodeColor = color;
+    d3.selectAll(".nodecircle").style("fill", color)
 }
 
-{/* <button style="background-color: rgb(200,200,200);" class="selector nodeColor on" id="nodeColor-gray" onclick="setNodeColor('gray')">&nbsp;</button> */}
+const defaultnodeColor = "lightgray"
 
 const nodeColorOptions = [
-    ["rgb(200,200,200)", "gray"],
-    ["pink", "pink"],
-    ["lightblue", "blue"],
-    ["lightgreen", "green"],
-    ["white", "white"]
+    defaultnodeColor,
+    "pink",
+    "lightblue",
+    "lightgreen",
+    "white",
 ]
 
-for (const colorcolor of nodeColorOptions) {
+for (const color of nodeColorOptions) {
     d3.select("#nodeColorOptions")
         .append("button")
-        .attr("style", "background-color: " + colorcolor[0] + ";")
+        .attr("style", "background-color: " + color + ";")
         .attr("class", "selector nodeColor off")
-        .attr("id", "nodeColor-"+colorcolor[1])
-        .attr("onclick", "setNodeColor('"+colorcolor[0]+"','"+colorcolor[1]+"')")
+        .attr("id", "nodeColor-"+color)
+        .attr("onclick", "setNodeColor('"+color+"')")
         .text("\xa0")
 }
 
-d3.select("#nodeColor-gray").attr("class", "selector nodeColor on")
+d3.select("#nodeColor-"+defaultnodeColor).attr("class", "selector nodeColor on")
 
 
 animate(0, Infinity,
