@@ -4,15 +4,35 @@
 /////////////////////
 // Math Operations //
 /////////////////////
+const nodeRad = 25;
 
 function nearestMultiple(num, mul) {
     return Math.round(num/mul) * mul
 }
 
+function cAdd(com1, com2) {
+    return [com1[0]+com2[0], com1[1]+com2[1]]
+}
+
+function cMul(com1, com2) {
+    return [com1[0]*com2[0]-com1[1]*com2[1], com1[0]*com2[1]+com1[1]*com2[0]]
+}
+
 function midPoint(coord1,coord2, bend = 0) {
     const a = Number(coord1[0]), b = Number(coord1[1]);
     const c = Number(coord2[0]), d = Number(coord2[1]);
-    return [0.5 *a + 0.01 *b*bend - 0.01* bend *d + 0.5* c, -0.01* a*bend + 0.01 *c*bend + 0.5*b + 0.5 *d]
+    return cAdd([a,b], cMul([c-a,d-b],[0.5, bend/100]));
+    // (0.5 + (bend/100)i)((c+di)-(a+bi)) + (a+bi)
+}
+
+function shrinkPath(coord1, coord2, bend = 0) {
+    const a = Number(coord1[0]), b = Number(coord1[1]);
+    const c = Number(coord2[0]), d = Number(coord2[1]);
+    const shrinkFactor = nodeRad/((0.25+(bend/100)**2)**0.5*((a-c)**2+(b-d)**2)**0.5);
+    const s = cAdd([a,b], cMul([c-a,d-b],[0.5*shrinkFactor, bend*shrinkFactor/100]))
+    const t = cAdd([a,b], cMul([c-a,d-b],[1-0.5*shrinkFactor, bend*shrinkFactor/100]))
+    return [s,t];
+    // r(0.5 + (bend/100)i)((c+di)-(a+bi)) + (a+bi)
 }
 
 /////////////////////
@@ -78,7 +98,6 @@ function clearCanvas() {
 
 let toLoad;
 function loadFile() {
-    d3.select("#inputstatusbox").text(inputstatus);
     const [file] = document.getElementById("loadFile").files;
     const reader = new FileReader();
   
@@ -112,7 +131,7 @@ function saveFile() {
     inputstatus = "";
     clickqueue = [];
     updateToolbarQueue();
-    d3.select("#inputstatusbox").text(inputstatus);
+    d3.select("#inputstatusbox").text(inputstatus).attr("style", "font-family: monospace");
     const nodeRecord = [];
     const edgeRecord = [];
     const visitedEdges = [];
@@ -183,6 +202,13 @@ const svg = d3.select("body").insert("svg", "#tutorial")
                 .attr("height", window.innerHeight - offset)
                 .attr("style", "top: "+offset+"px; position: fixed;")
 
+svg.append("defs").append("marker")
+    .attr("id", "arrow")
+    .attr("refX", 3).attr("refY", 3)
+    .attr("markerWidth", 10).attr("markerHeight", 10)
+    .attr("orient", "auto-start-reverse")
+    .append("path").attr("d","M -2 0 L 4 3 L -2 6 z")
+
 svg.append("div").attr("id", "divider"); // divide edges and nodes
 
 ////////////////////
@@ -205,7 +231,7 @@ class node {
                             .attr("style", "cursor: pointer;")
 
         shapegroup.append("circle")
-                .attr("cx", x).attr("cy", y).attr("r", 25)
+                .attr("cx", x).attr("cy", y).attr("r", nodeRad)
                 .attr("fill", nodeColor).attr("stroke", "black")
                 .attr("stroke-width", 5).attr("class", "nodeCircle")
 
@@ -227,30 +253,35 @@ class edge {
 
         const thisid = "edge-"+autoedgenumber;
         // edge representation: ["edge",x1,y1,x2,y2,label, arrow, w, b]
+        const [x1y1, x2y2] = [getProp(node1,"coord"), getProp(node2,"coord")];
+        const midpoint = midPoint(x1y1, x2y2, bend);
+        const [realStart,realEnd] = shrinkPath(x1y1,x2y2,bend);
+
         const thisedge = svg.insert("g", "#divider")
-                            .attr("id", thisid)
-                            .attr("onclick", "edgeClicked(this.id)")
-                            .attr("start", node1)
-                            .attr("end", node2)
-                            .attr("style", "cursor: pointer;")
-                            .attr("arrow", arrow)
-                            .attr("weight", weight)
-                            .attr("bend", bend)
+            .attr("id", thisid)
+            .attr("onclick", "edgeClicked(this.id)")
+            .attr("start", node1)
+            .attr("end", node2)
+            .attr("style", "cursor: pointer;")
+            .attr("arrow", arrow)
+            .attr("weight", weight)
+            .attr("bend", bend)
+            .append("path")
+            .attr("style", "fill:none; stroke:black; stroke-width:10;")
+            .attr("d", "M " + realStart.join(" ")
+            + " Q " + midpoint.join(" ") 
+            + " " + realEnd.join(" ")
+            + "")
+            .attr("class", "edgepath")
+            
+        if (arrow==1) {
+            thisedge.attr("marker-end", "url(#arrow)")
+        }
+            
 
         adjlist[node1].push([node2, thisid]);
 
         if (arrow==0) {adjlist[node2].push([node1, thisid])};
-
-        const [x1y1, x2y2] = [getProp(node1,"coord"), getProp(node2,"coord")];
-        const midpoint = midPoint(x1y1, x2y2, bend);
-
-        thisedge.append("path")
-            .attr("style", "fill:none; stroke:black; stroke-width:10;")
-            .attr("d", "M " + x1y1.join(" ")
-            + " Q " + midpoint[0] + " " + midpoint[1] 
-            + " " + x2y2.join(" ")
-            + "")
-            .attr("class", "edgepath")
         
         autoedgenumber++;
     }
@@ -282,7 +313,7 @@ d3.select("body").on('keydown', (event) => {
         inputstatus += event.key;
     }
 
-    d3.select("#inputstatusbox").text(inputstatus);
+    d3.select("#inputstatusbox").text(inputstatus).attr("style", "font-family: monospace");
 })
 
 ////////////////
@@ -445,12 +476,12 @@ animate(0, Infinity,
     (elapsed) => {
         if (breathing) {
             d3.selectAll(".nodeCircle")
-                .attr("r",25 + 3*Math.sin(elapsed/500));
+                .attr("r", nodeRad + 2.5*Math.sin(elapsed/500));
             d3.selectAll(".edgepath")
                 .attr("style", "fill: none; stroke: black; stroke-width: " + (10 + 2*Math.sin(elapsed/500)) + ";")
         } else {
             d3.selectAll(".nodeCircle")
-                .attr("r",25);
+                .attr("r", nodeRad);
             d3.selectAll(".edgepath")
                 .attr("style", "fill: none; stroke: black; stroke-width: 10;")
         }
@@ -502,7 +533,6 @@ function moveNode(node1, coord) {
 
 function getProp(thingID, property) {
     const target = d3.select("#"+thingID);
-    let pathparse;
     switch (property) {
         case "coord": // for nodes
             return [target.select("circle").attr("cx"), 

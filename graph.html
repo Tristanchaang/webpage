@@ -15,6 +15,7 @@
 
 <body style="margin:0;overflow:hidden;">
 <link rel="stylesheet" href="css/graph.css">
+
 <div id="toppart">
     <br>
     <div id="toolbar" style="overflow:hidden;">&nbsp;&nbsp;
@@ -61,8 +62,15 @@
         <h3>Adding Edges</h3>
         <ol>
             <li>Click on two nodes.</li>
+            <li>(Optional) Type an <i>edge attribute command</i> (see below).</li>
             <li>Click <b>Enter</b> or hit enter/return on the keyboard. You can add a sequence of edges by clicking multiple nodes.</li>
         </ol>
+        <i>*Edge attribute command.</i> Each edge can have three attributes: Directedness (dir), Weight (w), and Bend (b). By default, edges will be undirected, with w=b=0. To assign weight/bend, the subcommands <span style="font-family: monospace">w=?</span> and <span style="font-family: monospace">b=?</span> respectively are used. To enable direction, the subcommand <span style="font-family: monospace">dir</span> suffices. You can activate all three attributes by linking these subcommands via a comma in any order. E.g. 
+        <ul>
+            <li><span style="font-family: monospace">w=10,b=20</span> represents an undirected edge with weight 10 and bend 20%.</li>
+            <li><span style="font-family: monospace">dir,b=50</span> represents a directed edge with weight 0 and bend 50%.</li>
+        </ul>
+        Do not use any spaces in the command. FYI: Bend can be positive (rightwards) or negative (leftwards); it represents the distance from the turning point to the midpoint of the two nodes, as a percentage of half the distance between the two nodes.
         <h3>Deleting Objects</h3>
         <ol>
             <li>Click on the object(s) you want to remove.</li>
