@@ -24,12 +24,8 @@ function edgeClicked(thisid) {
 }
 
 function midPoint(coord1,coord2, bend = 0) {
-    [a,b] = coord1;
-    [c,d] = coord2;
-    a = Number(a);
-    b = Number(b);
-    c = Number(c);
-    d = Number(d);
+    const a = Number(coord1[0]), b = Number(coord1[1]);
+    const c = Number(coord2[0]), d = Number(coord2[1]);
     return [0.5 *a + 0.01 *b*bend - 0.01* bend *d + 0.5* c, -0.01* a*bend + 0.01 *c*bend + 0.5*b + 0.5 *d]
 }
 
