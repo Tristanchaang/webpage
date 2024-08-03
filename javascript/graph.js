@@ -72,6 +72,26 @@ function closeSettings() {
     d3.select("#overlay").attr("class", "")
 }
 
+let toLoad = "";
+
+function loadFile() {
+    const [file] = document.querySelector("input[type=file]").files;
+    const reader = new FileReader();
+  
+    reader.addEventListener(
+      "load",
+      () => {
+        toLoad = reader.result;
+        console.log(toLoad);
+      },
+      false,
+    );
+  
+    if (file) {
+      reader.readAsText(file);
+    }
+  }
+
 const offset = document.getElementById("toppart").offsetHeight;
 const svg = d3.select("body").insert("svg", "#tutorial");
 setattrs(svg, {
