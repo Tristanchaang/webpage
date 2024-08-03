@@ -81,6 +81,8 @@ let toLoad;
 function loadFile() {
     inputstatus = "";
     clickqueue = [];
+    updateToolbarQueue();
+    d3.select("#inputstatusbox").text(inputstatus);
     const [file] = document.getElementById("loadFile").files;
     const reader = new FileReader();
   
@@ -113,6 +115,8 @@ function loadFile() {
 function saveFile() {
     inputstatus = "";
     clickqueue = [];
+    updateToolbarQueue();
+    d3.select("#inputstatusbox").text(inputstatus);
     const nodeRecord = [];
     const edgeRecord = [];
     const visitedEdges = [];
