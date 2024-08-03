@@ -1,32 +1,31 @@
-function animate(delay, duration, func) {
-    let t = d3.timer((elapsed) => {
-        func(elapsed);
-        if (elapsed >= duration) {t.stop();}
-        }, delay)
-}
+/////////////////////
+// Math Operations //
+/////////////////////
 
-function nearestMultiple(num, mul) {return Math.round(num/mul) * mul}
-
-let nodeisclicked = false;
-function nodeClicked(thisid) {
-    // console.log("Node Selected: " + thisid)
-    const splitted = thisid.split("-");
-    clickqueue.push(["node",Number(splitted[1]),Number(splitted[2])])
-    nodeisclicked = true;
-}
-
-let edgeisclicked = false;
-function edgeClicked(thisid) {
-    // console.log("Node Selected: " + thisid)
-    const splitted = thisid.split("-");
-    clickqueue.push(splitted);
-    edgeisclicked = true;
+function nearestMultiple(num, mul) {
+    return Math.round(num/mul) * mul
 }
 
 function midPoint(coord1,coord2, bend = 0) {
     const a = Number(coord1[0]), b = Number(coord1[1]);
     const c = Number(coord2[0]), d = Number(coord2[1]);
     return [0.5 *a + 0.01 *b*bend - 0.01* bend *d + 0.5* c, -0.01* a*bend + 0.01 *c*bend + 0.5*b + 0.5 *d]
+}
+
+/////////////////////
+// Buttons Pressed //
+/////////////////////
+
+let nodeisclicked = false;
+function nodeClicked(thisid) {
+    clickqueue.push(thisid.split("-"))
+    nodeisclicked = true;
+}
+
+let edgeisclicked = false;
+function edgeClicked(thisid) {
+    clickqueue.push(thisid.split("-"));
+    edgeisclicked = true;
 }
 
 function pressed(key) {
@@ -59,8 +58,11 @@ function closeSettings() {
     d3.select("#overlay").attr("class", "")
 }
 
-let toLoad;
+////////////////////
+// Load/Save File //
+////////////////////
 
+let toLoad;
 function loadFile() {
     const [file] = document.getElementById("loadFile").files;
     const reader = new FileReader();
@@ -87,8 +89,7 @@ function loadFile() {
                 new edge(["node", freshobj[1],freshobj[2]], ["node", freshobj[3], freshobj[4]], freshobj[5], freshobj[6], freshobj[7]);
             }
         }
-      },
-      false,
+      }, false,
     );
   
     if (file) {
@@ -120,11 +121,16 @@ function saveFile() {
 
     element.style.display = 'none';
     document.body.appendChild(element);
-
     element.click();
-
     document.body.removeChild(element);
+
+    inputstatus = "";
+    clickqueue = [];
 }
+
+//////////////////////
+// Background Setup //
+//////////////////////
 
 const offset = document.getElementById("toppart").offsetHeight;
 const svg = d3.select("body").insert("svg", "#tutorial")
@@ -133,6 +139,10 @@ const svg = d3.select("body").insert("svg", "#tutorial")
                 .attr("style", "top: "+offset+"px; position: fixed;")
 
 svg.append("div").attr("id", "divider");
+
+////////////////////
+// Object Classes //
+////////////////////
 
 adjlist = Object() // {"node",x,y: [[neighbours, ...], label], ...}
 
@@ -196,6 +206,10 @@ class edge {
 let clickqueue = [];
 let inputstatus = "";
 
+/////////////////////
+// Key/Click Event //
+/////////////////////
+
 svg.on('click', (event) => {
     if (!nodeisclicked && !edgeisclicked) {
         clickqueue.push(["empty",nearestMultiple(event.x,50), nearestMultiple(event.y-offset,50)])
@@ -217,6 +231,10 @@ d3.select("body").on('keydown', (event) => {
 
     d3.select("#inputstatusbox").text(inputstatus);
 })
+
+////////////////
+// Processing //
+////////////////
 
 let autonodenumber = 1
 
@@ -260,37 +278,11 @@ function processInput() {
             }
         }
     }
-
-    // console.log("adjlist:")
-    // for (const thing of Object.keys(adjlist)) {console.log(thing,adjlist[thing]);}
 }
 
 function processDeletion() {
     for (const curobj of clickqueue) {
-        
-        if (curobj[0] === "node") {
-            for (const nbedge of adjlist[curobj][0]) {
-                nbedge[1].remove();
-            }
-            delete adjlist[curobj];
-
-            for (const nodetrip of Object.keys(adjlist)) {
-                adjlist[nodetrip][0] = adjlist[nodetrip][0].filter((nodeedge) => {
-                    return !(nodeedge[0].join("-") === curobj.join("-"))
-                })
-            }
-        }
-
-        if (curobj[0] === "edge") {
-            for (const nodetrip of Object.keys(adjlist)) {
-                adjlist[nodetrip][0] = adjlist[nodetrip][0].filter((nodeedge) => {
-                    return !(nodeedge[1].attr("id") === curobj.join("-"))
-                })
-            }
-        }
-
-        d3.select("#"+curobj.join("-")).remove();
-
+        deleteObj(curobj);
     }
 }
 
@@ -345,26 +337,12 @@ function updateToolbarQueue() {
                 .attr("cx", 8).attr("cy", 35).attr("r", 4)
                 .attr("fill", "black")
         }
-
-        elbox.append("animateMotion")
-            .attr("path", "m43,0 l -43,0")
-            .attr("begin","0s")
-            .attr("dur", "0.2s")
-            .attr("repeatCount", 1)
     }
 }
 
-const N = 5, M = 8;
-
-for (let i = 0; i < N; i++) {
-    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
-    Math.round(200 - 100 * Math.cos(2 * Math.PI * i / N)), "a"+String(i))
-}
-
-for (let i = 0; i < M; i++) {
-    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / M)), 
-    Math.round(500 - 100 * Math.cos(2 * Math.PI * i / M)), "b"+String(i))
-}
+//////////////
+// Settings //
+//////////////
 
 let breathing = true;
 
@@ -373,15 +351,6 @@ function toggleBreathing() {
     d3.select("#toggleBreathing")
         .attr("class", "toggler "+(breathing ? "on" : "off"))
         .text(breathing ? "On" : "Off");
-}
-
-
-
-function setNodeColor(color) {
-    d3.selectAll(".nodeColor").attr("class", "selector nodeColor off");
-    d3.select("#nodeColor-"+color).attr("class", "selector nodeColor on");
-    nodeColor = color;
-    d3.selectAll(".nodecircle").style("fill", color)
 }
 
 const defaultNodeColor = "lightgray"
@@ -406,6 +375,16 @@ for (const color of nodeColorOptions) {
 
 d3.select("#nodeColor-"+defaultNodeColor).attr("class", "selector nodeColor on")
 
+////////////////
+// Animations //
+////////////////
+
+function animate(delay, duration, func) {
+    let t = d3.timer((elapsed) => {
+        func(elapsed);
+        if (elapsed >= duration) {t.stop();}
+        }, delay)
+}
 
 animate(0, Infinity,
     (elapsed) => {
@@ -422,3 +401,55 @@ animate(0, Infinity,
         }
     }
 )
+
+///////////////////////
+// Object Operations //
+///////////////////////
+
+function deleteObj(thing) {
+    if (thing[0] === "node") {
+        for (const nbedge of adjlist[thing][0]) {
+            nbedge[1].remove();
+        }
+        delete adjlist[thing];
+
+        for (const nodetrip of Object.keys(adjlist)) {
+            adjlist[nodetrip][0] = adjlist[nodetrip][0].filter((nodeedge) => {
+                return !(nodeedge[0].join("-") === thing.join("-"))
+            })
+        }
+    }
+
+    if (thing[0] === "edge") {
+        for (const nodetrip of Object.keys(adjlist)) {
+            adjlist[nodetrip][0] = adjlist[nodetrip][0].filter((nodeedge) => {
+                return !(nodeedge[1].attr("id") === thing.join("-"))
+            })
+        }
+    }
+
+    d3.select("#"+thing.join("-")).remove();
+}
+
+function setNodeColor(color) {
+    d3.selectAll(".nodeColor").attr("class", "selector nodeColor off");
+    d3.select("#nodeColor-"+color).attr("class", "selector nodeColor on");
+    nodeColor = color;
+    d3.selectAll(".nodecircle").style("fill", color)
+}
+
+//////////////////
+// Manual Input //
+//////////////////
+
+const N = 5, M = 8;
+
+for (let i = 0; i < N; i++) {
+    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
+    Math.round(200 - 100 * Math.cos(2 * Math.PI * i / N)), "a"+String(i))
+}
+
+for (let i = 0; i < M; i++) {
+    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / M)), 
+    Math.round(500 - 100 * Math.cos(2 * Math.PI * i / M)), "b"+String(i))
+}
