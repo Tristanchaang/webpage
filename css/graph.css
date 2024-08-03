@@ -43,7 +43,7 @@
 }
 
 .selector.on {
-    border: 2px solid black;
+    border: 5px inset black;
 }
 
 #tutorial, #settings {

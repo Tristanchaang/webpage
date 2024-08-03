@@ -19,7 +19,7 @@ let edgeisclicked = false;
 function edgeClicked(thisid) {
     // console.log("Node Selected: " + thisid)
     const splitted = thisid.split("-");
-    clickqueue.push(["edge",Number(splitted[1]),Number(splitted[2]),Number(splitted[3]),Number(splitted[4])])
+    clickqueue.push(splitted);
     edgeisclicked = true;
 }
 
@@ -28,7 +28,6 @@ function midPoint(coord1,coord2, bend = 0) {
     const c = Number(coord2[0]), d = Number(coord2[1]);
     return [0.5 *a + 0.01 *b*bend - 0.01* bend *d + 0.5* c, -0.01* a*bend + 0.01 *c*bend + 0.5*b + 0.5 *d]
 }
-
 
 function pressed(key) {
     switch (key) {
@@ -60,17 +59,34 @@ function closeSettings() {
     d3.select("#overlay").attr("class", "")
 }
 
-let toLoad = "";
+let toLoad;
 
 function loadFile() {
-    const [file] = document.querySelector("input[type=file]").files;
+    const [file] = document.getElementById("loadFile").files;
     const reader = new FileReader();
   
     reader.addEventListener(
       "load",
       () => {
+
+        adjlist = Object();
+        svg.selectAll("g").remove();
+
         toLoad = reader.result;
-        console.log(toLoad);
+        for (const obj of toLoad.split(";")) {
+            // console.log(obj);
+            let freshobj = obj.split(",");
+            if (freshobj[0] == "node") {
+                new node(freshobj[1], freshobj[2], freshobj[3]);
+            }
+        }
+        for (const obj of toLoad.split(";")) {
+            // console.log(obj);
+            let freshobj = obj.split(",");
+            if (freshobj[0] == "edge") {
+                new edge(["node", freshobj[1],freshobj[2]], ["node", freshobj[3], freshobj[4]], freshobj[5], freshobj[6], freshobj[7]);
+            }
+        }
       },
       false,
     );
@@ -78,7 +94,36 @@ function loadFile() {
     if (file) {
       reader.readAsText(file);
     }
+    
   }
+
+function saveFile() {
+    toSave = "";
+    const visitedEdges = [];
+
+    for (const nodexy of Object.keys(adjlist)) {
+        toSave += nodexy + "," + adjlist[nodexy][1] + ";";
+        for (const edgeobj of adjlist[nodexy][0]) {
+            const edgeid = edgeobj[1].attr("id");
+            if (!visitedEdges.includes(edgeid)) {
+                toSave += edgeid.split("-").slice(0,5) + "," + edgeid.split("-").slice(6) + ";";
+                visitedEdges.push(edgeid);
+            }
+            
+        }
+    }
+
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(toSave));
+    element.setAttribute('download', 'graph.csv');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
 
 const offset = document.getElementById("toppart").offsetHeight;
 const svg = d3.select("body").insert("svg", "#tutorial")
@@ -88,9 +133,9 @@ const svg = d3.select("body").insert("svg", "#tutorial")
 
 svg.append("div").attr("id", "divider");
 
-adjlist = Object() // {[x,y]: [[neighbours, ...], label], ...}
+adjlist = Object() // {["node",x,y]: [[neighbours, ...], label], ...}
 
-let nodeColor = 'rgb(200,200,200)';
+let nodeColor = 'lightgray';
 
 class node {
     constructor(x, y, label) {
@@ -235,6 +280,14 @@ function processDeletion() {
             }
         }
 
+        if (curobj[0] === "edge") {
+            for (const nodetrip of Object.keys(adjlist)) {
+                adjlist[nodetrip][0] = adjlist[nodetrip][0].filter((nodeedge) => {
+                    return !(nodeedge[1].attr("id") === curobj.join("-"))
+                })
+            }
+        }
+
         d3.select("#"+curobj.join("-")).remove();
 
     }
@@ -302,7 +355,6 @@ function updateToolbarQueue() {
 
 const N = 5, M = 8;
 
-
 for (let i = 0; i < N; i++) {
     new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
     Math.round(200 - 100 * Math.cos(2 * Math.PI * i / N)), "a"+String(i))
@@ -331,10 +383,10 @@ function setNodeColor(color) {
     d3.selectAll(".nodecircle").style("fill", color)
 }
 
-const defaultnodeColor = "lightgray"
+const defaultNodeColor = "lightgray"
 
 const nodeColorOptions = [
-    defaultnodeColor,
+    defaultNodeColor,
     "pink",
     "lightblue",
     "lightgreen",
@@ -351,7 +403,7 @@ for (const color of nodeColorOptions) {
         .text("\xa0")
 }
 
-d3.select("#nodeColor-"+defaultnodeColor).attr("class", "selector nodeColor on")
+d3.select("#nodeColor-"+defaultNodeColor).attr("class", "selector nodeColor on")
 
 
 animate(0, Infinity,
