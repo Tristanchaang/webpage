@@ -72,16 +72,12 @@ function clearCanvas() {
     autoedgenumber = 1;
 }
 
-
 ////////////////////
 // Load/Save File //
 ////////////////////
 
 let toLoad;
 function loadFile() {
-    inputstatus = "";
-    clickqueue = [];
-    updateToolbarQueue();
     d3.select("#inputstatusbox").text(inputstatus);
     const [file] = document.getElementById("loadFile").files;
     const reader = new FileReader();
@@ -166,7 +162,7 @@ function saveFile() {
     let element = document.createElement('a');
     let filename = document.getElementById('saveFileName').value
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(toSave));
-    element.setAttribute('download', filename+'.csv');
+    element.setAttribute('download', filename+'.graph');
 
     element.style.display = 'none';
     document.body.appendChild(element);
