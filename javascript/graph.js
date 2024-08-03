@@ -1,11 +1,3 @@
-function changeattr(shapelist,prop,val) {
-    for (let shape of shapelist) shape.attr(prop, val);
-}
-
-function setattrs(shape, dict) {
-    for (let [prop, val] of Object.entries(dict)) shape.attr(prop, val);
-}
-
 function animate(delay, duration, func) {
     let t = d3.timer((elapsed) => {
         func(elapsed);
@@ -93,12 +85,11 @@ function loadFile() {
   }
 
 const offset = document.getElementById("toppart").offsetHeight;
-const svg = d3.select("body").insert("svg", "#tutorial");
-setattrs(svg, {
-    'width': window.innerWidth, 
-    'height': window.innerHeight - offset,
-    'style': "top: " + offset + "px; position: fixed;",
-});
+const svg = d3.select("body").insert("svg", "#tutorial")
+                .attr("width", window.innerWidth)
+                .attr("height", window.innerHeight - offset)
+                .attr("style", "top: "+offset+"px; position: fixed;")
+
 svg.append("div").attr("id", "divider");
 
 adjlist = Object() // {[x,y]: [[neighbours, ...], label], ...}
@@ -114,31 +105,21 @@ class node {
 
         const shapegroup = svg.append("g");
 
-        setattrs(shapegroup, {
-            "id": "node-"+[x,y].join("-"),
-            "onclick": "nodeClicked(this.id)",
-            "style": "cursor: pointer;"
-        })
+        shapegroup.attr("id", "node-"+[x,y].join("-"))
+                    .attr("onclick", "nodeClicked(this.id)")
+                    .attr("style", "cursor: pointer;")
 
-        const nodecirc = shapegroup.append("circle")
-        setattrs(nodecirc, {
-            "cx": x, "cy": y, "r": 25, 
-            "fill": nodeColor, 
-            "stroke": "black",
-            "stroke-width": 5,
-            "class": "nodecircle"
-        })
-        
-        const nodelabel = shapegroup.append("text")
-        nodelabel.text(String(label))
-        setattrs(nodelabel, {
-            "x": x, "y": y,
-            "text-anchor": "middle",
-            "dominant-baseline": "central",
-            "font-size": 25,
-            "font-family": "Arial, Helvetica, sans-serif",
-            "font-weight": "bold"
-        })
+        shapegroup.append("circle")
+                .attr("cx", x).attr("cy", y).attr("r", 25)
+                .attr("fill", nodeColor).attr("stroke", "black")
+                .attr("stroke-width", 5).attr("class", "nodecircle")
+
+        shapegroup.append("text")
+                .text(String(label))
+                .attr("x", x).attr("y", y).attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central").attr("font-size", 25)
+                .attr("font-family", "Arial, Helvetica, sans-serif")
+                .attr("font-weight", "bold")
     }
 }
 
@@ -160,15 +141,13 @@ class edge {
 
         const midpoint = midPoint(node1.slice(1,3), node2.slice(1,3), bend)
 
-
-        setattrs(thisedge.append("path"), {
-            "style": "fill:none; stroke:black; stroke-width:10;",
-            "d": "M " + node1[1] + " " + node1[2] 
+        thisedge.append("path")
+            .attr("style", "fill:none; stroke:black; stroke-width:10;")
+            .attr("d", "M " + node1[1] + " " + node1[2] 
             + " Q " + midpoint[0] + " " + midpoint[1] 
             + " " + node2[1] + " " + node2[2] 
-            + "",
-            "class": "edgepath"
-        })
+            + "")
+            .attr("class", "edgepath")
     }
 }
 
