@@ -79,6 +79,8 @@ function clearCanvas() {
 
 let toLoad;
 function loadFile() {
+    inputstatus = "";
+    clickqueue = [];
     const [file] = document.getElementById("loadFile").files;
     const reader = new FileReader();
   
@@ -109,6 +111,8 @@ function loadFile() {
   }
 
 function saveFile() {
+    inputstatus = "";
+    clickqueue = [];
     const nodeRecord = [];
     const edgeRecord = [];
     const visitedEdges = [];
