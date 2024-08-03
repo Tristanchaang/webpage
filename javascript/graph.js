@@ -1,3 +1,5 @@
+// Major Turn Point: Implement Simple Node Code and Edge Code.
+
 /////////////////////
 // Math Operations //
 /////////////////////
@@ -436,6 +438,13 @@ function setNodeColor(color) {
     d3.select("#nodeColor-"+color).attr("class", "selector nodeColor on");
     nodeColor = color;
     d3.selectAll(".nodecircle").style("fill", color)
+}
+
+function moveNode(node1, coord) {
+    // edit html
+
+
+    // edit
 }
 
 //////////////////
