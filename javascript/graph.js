@@ -114,8 +114,9 @@ function saveFile() {
     }
 
     let element = document.createElement('a');
+    let filename = document.getElementById('saveFileName').value
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(toSave));
-    element.setAttribute('download', 'graph.csv');
+    element.setAttribute('download', filename+'.csv');
 
     element.style.display = 'none';
     document.body.appendChild(element);
@@ -133,7 +134,7 @@ const svg = d3.select("body").insert("svg", "#tutorial")
 
 svg.append("div").attr("id", "divider");
 
-adjlist = Object() // {["node",x,y]: [[neighbours, ...], label], ...}
+adjlist = Object() // {"node",x,y: [[neighbours, ...], label], ...}
 
 let nodeColor = 'lightgray';
 
