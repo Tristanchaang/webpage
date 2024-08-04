@@ -202,13 +202,6 @@ const svg = d3.select("body").insert("svg", "#tutorial")
                 .attr("height", window.innerHeight - offset)
                 .attr("style", "top: "+offset+"px; position: fixed;")
 
-svg.append("defs").append("marker")
-    .attr("id", "arrow")
-    .attr("refX", 3).attr("refY", 3)
-    .attr("markerWidth", 10).attr("markerHeight", 10)
-    .attr("orient", "auto-start-reverse")
-    .append("path").attr("d","M -2 0 L 4 3 L -2 6 z")
-
 svg.append("div").attr("id", "divider"); // divide edges and nodes
 
 ////////////////////
@@ -266,16 +259,24 @@ class edge {
             .attr("arrow", arrow)
             .attr("weight", weight)
             .attr("bend", bend)
-            .append("path")
+        
+        thisedge.append("defs").append("marker")
+            .attr("id", "arrow-of-"+thisid)
+            .attr("refX", 3).attr("refY", 3)
+            .attr("markerWidth", 10).attr("markerHeight", 10)
+            .attr("orient", "auto-start-reverse")
+            .append("path").attr("d","M -2 0 L 4 3 L -2 6 L 2 3 L -2 0 z")
+
+        const edgepathobj = thisedge.append("path")
             .attr("style", "fill:none; stroke:black; stroke-width:10;")
             .attr("d", "M " + realStart.join(" ")
             + " Q " + midpoint.join(" ") 
             + " " + realEnd.join(" ")
             + "")
             .attr("class", "edgepath")
-            
+        
         if (arrow==1) {
-            thisedge.attr("marker-end", "url(#arrow)")
+            edgepathobj.attr("marker-end", "url(#arrow-of-"+thisid+")")
         }
             
 
@@ -478,12 +479,13 @@ animate(0, Infinity,
             d3.selectAll(".nodeCircle")
                 .attr("r", nodeRad + 2.5*Math.sin(elapsed/500));
             d3.selectAll(".edgepath")
-                .attr("style", "fill: none; stroke: black; stroke-width: " + (10 + 2*Math.sin(elapsed/500)) + ";")
+                .style("stroke-width", (10 + 2*Math.sin(elapsed/500)))
+                
         } else {
             d3.selectAll(".nodeCircle")
                 .attr("r", nodeRad);
             d3.selectAll(".edgepath")
-                .attr("style", "fill: none; stroke: black; stroke-width: 10;")
+                .style("stroke-width", 10)
         }
     }
 )
@@ -522,6 +524,22 @@ function setNodeColor(color) {
     d3.select("#nodeColor-"+color).attr("class", "selector nodeColor on");
     nodeColor = color;
     d3.selectAll(".nodeCircle").style("fill", color)
+}
+
+function highlight(thing, status = 1) {
+    const target = d3.select("#"+thing)
+    if (thing.slice(0,4) == "node") {
+        target.select("circle")
+            .attr("stroke-width", (status ? 8 : 5))
+            .attr("stroke", (status ? "red" : "black"));
+        target.select("text")
+            .attr("fill", (status ? "red" : "black"));
+    } else if (thing.slice(0,4) == "edge") {
+        target.select("defs").select("marker")
+            .style("fill", (status ? "red" : "black"));
+        target.select(".edgepath")
+            .style("stroke", (status ? "red" : "black"));
+    }
 }
 
 function moveNode(node1, coord) {
