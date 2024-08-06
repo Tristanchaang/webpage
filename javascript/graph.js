@@ -25,6 +25,10 @@ function midPoint(coord1,coord2, bend = 0) {
     // (0.5 + (bend/100)i)((c+di)-(a+bi)) + (a+bi)
 }
 
+function makePath(coord1, coord2, bend=0) {
+    return "M " + coord1.join(" ") + " Q " + midPoint(coord1, coord2, bend).join(" ") + " " + coord2.join(" ");
+}
+
 function shrinkPath(coord1, coord2, bend = 0) {
     const a = Number(coord1[0]), b = Number(coord1[1]);
     const c = Number(coord2[0]), d = Number(coord2[1]);
@@ -269,10 +273,7 @@ class edge {
 
         const edgepathobj = thisedge.append("path")
             .attr("style", "fill:none; stroke:black; stroke-width:10;")
-            .attr("d", "M " + realStart.join(" ")
-            + " Q " + midpoint.join(" ") 
-            + " " + realEnd.join(" ")
-            + "")
+            .attr("d", makePath(realStart, realEnd, bend))
             .attr("class", "edgepath")
         
         if (arrow==1) {
@@ -324,6 +325,11 @@ d3.select("body").on('keydown', (event) => {
 let unknownlabelcounter = 1;
 
 function processInput() {
+
+    if (clickqueue.length === 2 && clickqueue[0].slice(0,4) === "node" && clickqueue[1].slice(0,5) === "empty") {
+        moveNode(clickqueue[0], clickqueue[1].split("-").slice(1,3));
+        return
+    }
 
     for (let queueEl of clickqueue) {
         queueEl = queueEl.split("-")
@@ -542,11 +548,35 @@ function highlight(thing, status = 1) {
     }
 }
 
-function moveNode(node1, coord) {
-    // edit html
-
-
-    // edit
+function moveNode(nodeselected, coord) {
+    // edit node
+    const nodeTarget = d3.select("#" + nodeselected);
+    nodeTarget.select("circle").attr("cx", coord[0]).attr("cy", coord[1]);
+    nodeTarget.select("text").attr("x", coord[0]).attr("y", coord[1]);
+    // edit edges
+    function changeEdge(edgeid) {
+        const edgeTarget = d3.select("#"+edgeid);
+        let newRawStart, newRawEnd;
+        const theBend = edgeTarget.attr("bend");
+        if (edgeTarget.attr("start") == nodeselected) {
+            newRawStart = coord;
+            newRawEnd = getProp(edgeTarget.attr("end"), "coord");
+        }
+        if (edgeTarget.attr("end") == nodeselected) {
+            newRawStart = getProp(edgeTarget.attr("start"), "coord");
+            newRawEnd = coord;
+        }
+        const [newStart, newEnd] = shrinkPath(newRawStart, newRawEnd, theBend);
+        edgeTarget.select(".edgepath").attr("d", makePath(newStart, newEnd, theBend));
+    }
+    for (const curNode of Object.keys(adjlist)) {
+        for (const [node2, edgeid] of adjlist[curNode]) {
+            if (curNode == nodeselected || node2 == nodeselected) {
+                changeEdge(edgeid);
+            }
+        }
+    }
+    
 }
 
 function getProp(thingID, property) {
@@ -571,7 +601,7 @@ function getProp(thingID, property) {
 // Manual Input //
 //////////////////
 
-const N = 5, M = 8;
+const N = 5, M = 3;
 
 for (let i = 0; i < N; i++) {
     new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
