@@ -226,6 +226,7 @@ class node {
                             .attr("id", "node-"+autonodenumber)
                             .attr("onclick", "nodeClicked(this.id)")
                             .attr("style", "cursor: pointer;")
+                            .attr("highlight", 0)
 
         shapegroup.append("circle")
                 .attr("cx", x).attr("cy", y).attr("r", nodeRad)
@@ -263,6 +264,7 @@ class edge {
             .attr("arrow", arrow)
             .attr("weight", weight)
             .attr("bend", bend)
+            .attr("highlight", 0)
         
         thisedge.append("defs").append("marker")
             .attr("id", "arrow-of-"+thisid)
@@ -326,9 +328,18 @@ let unknownlabelcounter = 1;
 
 function processInput() {
 
+    if (inputstatus == "hl") {
+        for (let queueEl of clickqueue) {
+            if (queueEl.split("-")[0] != "empty") {
+                highlightToggle(queueEl);
+            }
+        }
+        return;
+    }
+
     if (clickqueue.length === 2 && clickqueue[0].slice(0,4) === "node" && clickqueue[1].slice(0,5) === "empty") {
         moveNode(clickqueue[0], clickqueue[1].split("-").slice(1,3));
-        return
+        return;
     }
 
     for (let queueEl of clickqueue) {
@@ -533,7 +544,7 @@ function setNodeColor(color) {
 }
 
 function highlight(thing, status = 1) {
-    const target = d3.select("#"+thing)
+    const target = d3.select("#"+thing).attr("highlight", status)
     if (thing.slice(0,4) == "node") {
         target.select("circle")
             .attr("stroke-width", (status ? 8 : 5))
@@ -545,6 +556,15 @@ function highlight(thing, status = 1) {
             .style("fill", (status ? "red" : "black"));
         target.select(".edgepath")
             .style("stroke", (status ? "red" : "black"));
+    }
+}
+
+function highlightToggle(thing) {
+    switch (d3.select("#"+thing).attr("highlight")) {
+        case "0":
+            highlight(thing, 1); break;
+        case "1":
+            highlight(thing, 0); break;
     }
 }
 
@@ -596,6 +616,62 @@ function getProp(thingID, property) {
     }
 
 }
+
+////////////////
+// Graph Algs //
+////////////////
+
+let mission = null;
+
+function nextStep() {
+    const valdone = mission.next();
+    if (!valdone.done) {
+        for (const obj of valdone.value) {
+            highlight(obj[0], 1, ...obj.slice(1));
+        }
+    } else {
+        for (const curnode of Object.keys(adjlist)) {
+            highlight(curnode, 0);
+            for (const curnodeedge of adjlist[curnode]) {
+                highlight(curnodeedge[1], 0);
+            }
+        }
+        return;
+    }
+    clickqueue = [];
+}
+
+function* bfs(source) {
+    const visited = [source];
+    const levels = [[source]];
+    cur_level = 0;
+    yield [[source]];
+    while (true) {
+        levels.push([]);
+        if (levels[cur_level].length == 0) {break}
+        for (const v of levels[cur_level]) {
+            for (const [nb,e] of adjlist[v]) {
+                if (!visited.includes(nb)) {
+                    yield [[e],[nb]]
+                    visited.push(nb)
+                    levels[cur_level+1].push(nb)
+                }
+            }
+                
+        }
+        cur_level++;
+    }
+}
+
+function activateBFS() {
+    if (clickqueue[0].slice(0,4) == "node") {
+        mission = bfs(clickqueue[0]);
+        nextStep();
+        clickqueue = [];
+        updateToolbarQueue();
+    }
+}
+    
 
 //////////////////
 // Manual Input //
