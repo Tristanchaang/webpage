@@ -577,6 +577,15 @@ function highlight(thing, status = 1, tag = "", tagcolor = "red") {
     }
 }
 
+function lowlight(thing, tag = "", tagcolor = "blue") {
+    const target = d3.select("#"+thing)
+    if (objType(thing) == "node") {
+        target.select(".nodeTag")
+            .attr("fill", tagcolor)
+            .text(tag);
+    }
+}
+
 function highlightToggle(thing) {
     switch (d3.select("#"+thing).attr("highlight")) {
         case "0":
@@ -640,20 +649,22 @@ function getProp(thingID, property) {
 ////////////////
 
 let mission = null;
-const algs = ["Alg", "BFS", "DFS"];
+const algs = ["Alg", "BFS", "DFS", "Dijkstra"];
 let curAlgID = 0;
+
+function assignMission() {
+    switch (d3.select("#algChange").text()) {
+        case "Alg": mission = null; break;
+        case "BFS": mission = bfs(); break;
+        case "DFS": mission = dfs(); break;
+        case "Dijkstra": mission = dijkstra(); break;
+    }
+}
 
 function changeAlg() {
     curAlgID = (curAlgID+1)%(algs.length)
     d3.select("#algChange").text(algs[curAlgID])
-    switch (algs[curAlgID]) {
-        case "Alg":
-            mission = null; break;
-        case "BFS":
-            mission = bfs(); break;
-        case "DFS":
-            mission = dfs(); break;
-    }
+    assignMission();
 }
 
 function nextStep() {
@@ -669,7 +680,9 @@ function nextStep() {
                 highlight(curnodeedge[1], 0);
             }
         }
+        assignMission();
         return;
+
     }
     clickqueue = [];
 }
@@ -732,12 +745,70 @@ function* dfs() {
         }
         if (remove_from_stack) {
             stack.pop();
-        }
-            
+        } 
     }
 }
-    
 
+function* dijkstra() {
+    if (clickqueue.length==1 && objType(clickqueue[0]) == "node") {
+        source = clickqueue[0];
+        clickqueue = [];
+        updateToolbarQueue();
+    } else {
+        return;
+    }
+
+    function extractmin(dict) {
+        const [lowestItems] = Object.entries(dict).sort(([ ,v1], [ ,v2]) => v1 - v2);
+        return lowestItems[0];
+    }
+
+    const fakedist = {};
+
+    for (const nodeid of Object.keys(adjlist)) fakedist[nodeid] = Infinity;
+    fakedist[source] = 0;
+
+    for (const nodeid of Object.keys(fakedist)) {
+        lowlight(nodeid, ((fakedist[nodeid] == Infinity) ? "∞" : fakedist[nodeid]), "blue")
+    }
+        
+    const truedist = {};
+
+    while (Object.entries(fakedist).length > 0) {
+        console.log(fakedist);
+        const popped = extractmin(fakedist);
+        const poppeddist = Number(fakedist[popped]);
+
+        truedist[popped] = poppeddist;
+
+        for (const [nb, e] of adjlist[popped]) {
+            if (Object.keys(fakedist).includes(nb)) { 
+                fakedist[nb] = Math.min(fakedist[nb], poppeddist + Number(getProp(e,"weight")!="" ? getProp(e,"weight") : 0))
+                lowlight(nb, ((fakedist[nb] == Infinity) ? "∞" : fakedist[nb]), "blue")
+            }
+        }
+
+        let foundedge = false;
+        let finaledge;
+        for (const other of Object.keys(truedist)) {
+            for (const [nb, e] of adjlist[other]) {
+                if (nb == popped && poppeddist == (truedist[other] + getProp(e,"weight"))) {
+                    foundedge = true;
+                    finaledge = e;
+                    break;
+                }
+            if (foundedge) break;    
+            }
+        }
+
+        const nodeyield = [[popped,(poppeddist == Infinity ? "∞" : poppeddist)]];
+
+        console.log((foundedge ? (nodeyield + [[finaledge]]) : nodeyield));
+        yield (foundedge ? nodeyield.concat([[finaledge]]) : nodeyield);
+
+        delete fakedist[popped];
+    }   
+}
 //////////////////
 // Manual Input //
 //////////////////
@@ -749,7 +820,7 @@ for (let i = 0; i < N; i++) {
     Math.round(200 - 100 * Math.cos(2 * Math.PI * i / N)), "a"+String(i))
 }
 
-for (let i = 0; i < M; i++) {
-    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / M)), 
-    Math.round(500 - 100 * Math.cos(2 * Math.PI * i / M)), "b"+String(i))
-}
+// for (let i = 0; i < M; i++) {
+//     new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / M)), 
+//     Math.round(500 - 100 * Math.cos(2 * Math.PI * i / M)), "b"+String(i))
+// }
