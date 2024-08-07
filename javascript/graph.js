@@ -239,7 +239,15 @@ class node {
                 .attr("x", x).attr("y", y).attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central").attr("font-size", 25)
                 .attr("font-family", "Arial, Helvetica, sans-serif")
+                .attr("font-weight", "bold").attr("class", "nodeLabel")
+
+        shapegroup.append("text")
+                .text("")
+                .attr("x", x).attr("y", y - nodeRad * 1.6).attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central").attr("font-size", 25)
+                .attr("font-family", "Arial, Helvetica, sans-serif")
                 .attr("font-weight", "bold")
+                .attr("fill", "red").attr("class", "nodeTag")
         
         autonodenumber++;
     }
@@ -277,7 +285,7 @@ class edge {
         const edgepathobj = thisedge.append("path")
             .attr("style", "fill:none; stroke:black; stroke-width:10;")
             .attr("d", makePath(realStart, realEnd, bend))
-            .attr("class", "edgepath")
+            .attr("class", "edgePath")
         
         if (arrow==1) {
             edgepathobj.attr("marker-end", "url(#arrow-of-"+thisid+")")
@@ -496,13 +504,13 @@ animate(0, Infinity,
         if (breathing) {
             d3.selectAll(".nodeCircle")
                 .attr("r", nodeRad + 2.5*Math.sin(elapsed/500));
-            d3.selectAll(".edgepath")
+            d3.selectAll(".edgePath")
                 .style("stroke-width", (10 + 2*Math.sin(elapsed/500)))
                 
         } else {
             d3.selectAll(".nodeCircle")
                 .attr("r", nodeRad);
-            d3.selectAll(".edgepath")
+            d3.selectAll(".edgePath")
                 .style("stroke-width", 10)
         }
     }
@@ -553,15 +561,18 @@ function setNodeColor(color) {
 function highlight(thing, status = 1, tag = "", tagcolor = "red") {
     const target = d3.select("#"+thing).attr("highlight", status)
     if (objType(thing) == "node") {
-        target.select("circle")
+        target.select(".nodeCircle")
             .attr("stroke-width", (status ? 8 : 5))
             .attr("stroke", (status ? "red" : "black"));
-        target.select("text")
+        target.select(".nodeLabel")
             .attr("fill", (status ? "red" : "black"));
+        target.select(".nodeTag")
+            .attr("fill", tagcolor)
+            .text(tag);
     } else if (objType(thing) == "edge") {
         target.select("defs").select("marker")
             .style("fill", (status ? "red" : "black"));
-        target.select(".edgepath")
+        target.select(".edgePath")
             .style("stroke", (status ? "red" : "black"));
     }
 }
@@ -594,7 +605,7 @@ function moveNode(nodeselected, coord) {
             newRawEnd = coord;
         }
         const [newStart, newEnd] = shrinkPath(newRawStart, newRawEnd, theBend);
-        edgeTarget.select(".edgepath").attr("d", makePath(newStart, newEnd, theBend));
+        edgeTarget.select(".edgePath").attr("d", makePath(newStart, newEnd, theBend));
     }
     for (const curNode of Object.keys(adjlist)) {
         for (const [node2, edgeid] of adjlist[curNode]) {
@@ -674,14 +685,14 @@ function* bfs() {
     const visited = [source];
     const levels = [[source]];
     cur_level = 0;
-    yield [[source]];
+    yield [[source, cur_level, "red"]];
     while (true) {
         levels.push([]);
         if (levels[cur_level].length == 0) {break}
         for (const v of levels[cur_level]) {
             for (const [nb,e] of adjlist[v]) {
                 if (!visited.includes(nb)) {
-                    yield [[e],[nb]]
+                    yield [[e],[nb, cur_level+1, "red"]]
                     visited.push(nb)
                     levels[cur_level+1].push(nb)
                 }
