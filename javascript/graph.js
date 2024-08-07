@@ -261,8 +261,8 @@ class edge {
         const thisid = "edge-"+autoedgenumber;
         // edge representation: ["edge",x1,y1,x2,y2,label, arrow, w, b]
         const [x1y1, x2y2] = [getProp(node1,"coord"), getProp(node2,"coord")];
-        const midpoint = midPoint(x1y1, x2y2, bend);
-        const [realStart,realEnd] = shrinkPath(x1y1,x2y2,bend);
+        const midpoint = midPoint(x1y1, x2y2, bend/2);
+        const [realStart,realEnd] = shrinkPath(x1y1, x2y2, bend);
 
         const thisedge = svg.insert("g", "#divider")
             .attr("id", thisid)
@@ -589,6 +589,8 @@ function highlight(thing, status = 1, tag = "", tagcolor = "red") {
             .style("fill", (status ? "red" : "black"));
         target.select(".edgePath")
             .style("stroke", (status ? "red" : "black"));
+        target.select(".edgeLabel")
+            .style("fill", (status ? "red" : "black"));
     }
 }
 
