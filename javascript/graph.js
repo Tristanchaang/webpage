@@ -261,8 +261,9 @@ class edge {
         const thisid = "edge-"+autoedgenumber;
         // edge representation: ["edge",x1,y1,x2,y2,label, arrow, w, b]
         const [x1y1, x2y2] = [getProp(node1,"coord"), getProp(node2,"coord")];
-        const midpoint = midPoint(x1y1, x2y2, bend/2);
+        
         const [realStart,realEnd] = shrinkPath(x1y1, x2y2, bend);
+        const midpoint = midPoint(realStart, realEnd, bend/2);
 
         const thisedge = svg.insert("g", "#divider")
             .attr("id", thisid)
@@ -420,6 +421,7 @@ function updateToolbarQueue() {
                 .attr("style", "float: right; margin: 0;")
                 .attr("height", 43)
                 .attr("width", 43)
+                .style("max-width", (window.innerWidth - document.getElementById("toolbuttonspace").offsetWidth - 20)+"px")
 
     for (const curclick of clickqueue) {
 
@@ -632,6 +634,11 @@ function moveNode(nodeselected, coord) {
         }
         const [newStart, newEnd] = shrinkPath(newRawStart, newRawEnd, theBend);
         edgeTarget.select(".edgePath").attr("d", makePath(newStart, newEnd, theBend));
+
+        const midpoint = midPoint(newStart, newEnd, theBend/2);
+        edgeTarget.select(".edgeLabel").attr("x", midpoint[0]).attr("y", midpoint[1]);
+        edgeTarget.select(".edgeLabelPad").attr("cx", midpoint[0]).attr("cy", midpoint[1]);
+
     }
     for (const curNode of Object.keys(adjlist)) {
         for (const [node2, edgeid] of adjlist[curNode]) {

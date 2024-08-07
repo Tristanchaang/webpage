@@ -104,7 +104,7 @@
 #clickqueue {
     float: right;
     right: 10px;
-    max-width: 40%;
+    /* max-width: 40%; */
     position: relative; /* Ensure the element is positioned relative for the animation to work */
     transform: translateX(43px);
     animation: moveRight 0.2s forwards;
