@@ -4,6 +4,7 @@
 /////////////////////
 // Math Operations //
 /////////////////////
+
 const nodeRad = 25;
 
 function nearestMultiple(num, mul) {
@@ -337,7 +338,7 @@ function processInput() {
         return;
     }
 
-    if (clickqueue.length === 2 && clickqueue[0].slice(0,4) === "node" && clickqueue[1].slice(0,5) === "empty") {
+    if (clickqueue.length === 2 && objType(clickqueue[0]) === "node" && objType(clickqueue[1]) === "empty") {
         moveNode(clickqueue[0], clickqueue[1].split("-").slice(1,3));
         return;
     }
@@ -355,7 +356,7 @@ function processInput() {
         }
     }
 
-    if (clickqueue.length === 1 && clickqueue[0].slice(0,4) === "node") {
+    if (clickqueue.length === 1 && objType(clickqueue[0]) === "node") {
         let nodename;
         if (inputstatus) {
             nodename = inputstatus;
@@ -375,7 +376,7 @@ function processInput() {
         }
 
         for (let i=0; i<clickqueue.length-1; i++) {
-            if (clickqueue[i].slice(0,4) === "node" && clickqueue[i+1].slice(0,4) === "node") {
+            if (objType(clickqueue[i]) === "node" && objType(clickqueue[i+1]) === "node") {
                 new edge(clickqueue[i], clickqueue[i+1], arrow, weight, bend)
             }
         }
@@ -511,8 +512,14 @@ animate(0, Infinity,
 // Object Operations //
 ///////////////////////
 
+function objType(thing) {
+    if (thing.slice(0,4) === "node") return "node";
+    if (thing.slice(0,4) === "edge") return "edge"; 
+    if (thing.slice(0,5) === "empty") return "empty"; 
+}
+
 function deleteObj(thing) {
-    if (thing.slice(0,4) === "node") {
+    if (objType(thing) === "node") {
         for (const nodeedge of adjlist[thing]) {
             d3.select("#"+nodeedge[1]).remove();
         }
@@ -525,7 +532,7 @@ function deleteObj(thing) {
         }
     }
 
-    if (thing.slice(0,4) === "edge") {
+    if (objType(thing) === "edge") {
         for (const nodeid of Object.keys(adjlist)) {
             adjlist[nodeid] = adjlist[nodeid].filter((nodeedge) => {
                 return !(nodeedge[1] === thing)
@@ -543,15 +550,15 @@ function setNodeColor(color) {
     d3.selectAll(".nodeCircle").style("fill", color)
 }
 
-function highlight(thing, status = 1) {
+function highlight(thing, status = 1, tag = "", tagcolor = "red") {
     const target = d3.select("#"+thing).attr("highlight", status)
-    if (thing.slice(0,4) == "node") {
+    if (objType(thing) == "node") {
         target.select("circle")
             .attr("stroke-width", (status ? 8 : 5))
             .attr("stroke", (status ? "red" : "black"));
         target.select("text")
             .attr("fill", (status ? "red" : "black"));
-    } else if (thing.slice(0,4) == "edge") {
+    } else if (objType(thing) == "edge") {
         target.select("defs").select("marker")
             .style("fill", (status ? "red" : "black"));
         target.select(".edgepath")
@@ -622,10 +629,25 @@ function getProp(thingID, property) {
 ////////////////
 
 let mission = null;
+const algs = ["Alg", "BFS", "DFS"];
+let curAlgID = 0;
+
+function changeAlg() {
+    curAlgID = (curAlgID+1)%(algs.length)
+    d3.select("#algChange").text(algs[curAlgID])
+    switch (algs[curAlgID]) {
+        case "Alg":
+            mission = null; break;
+        case "BFS":
+            mission = bfs(); break;
+        case "DFS":
+            mission = dfs(); break;
+    }
+}
 
 function nextStep() {
     const valdone = mission.next();
-    if (!valdone.done) {
+    if (!(mission == null) && !valdone.done) {
         for (const obj of valdone.value) {
             highlight(obj[0], 1, ...obj.slice(1));
         }
@@ -641,7 +663,14 @@ function nextStep() {
     clickqueue = [];
 }
 
-function* bfs(source) {
+function* bfs() {
+    if (clickqueue.length==1 && objType(clickqueue[0]) == "node") {
+        source = clickqueue[0];
+        clickqueue = [];
+        updateToolbarQueue();
+    } else {
+        return;
+    }
     const visited = [source];
     const levels = [[source]];
     cur_level = 0;
@@ -663,13 +692,9 @@ function* bfs(source) {
     }
 }
 
-function activateBFS() {
-    if (clickqueue[0].slice(0,4) == "node") {
-        mission = bfs(clickqueue[0]);
-        nextStep();
-        clickqueue = [];
-        updateToolbarQueue();
-    }
+function* dfs() {
+    console.log("i");
+    yield 0;
 }
     
 
