@@ -807,7 +807,7 @@ function* dijkstra() {
         let finaledge;
         for (const other of Object.keys(truedist)) {
             for (const [nb, e] of adjlist[other]) {
-                if (nb == popped && poppeddist == (truedist[other] + getProp(e,"weight"))) {
+                if (nb == popped && poppeddist == (Number(truedist[other]) + Number(getProp(e,"weight")))) {
                     foundedge = true;
                     finaledge = e;
                     break;
