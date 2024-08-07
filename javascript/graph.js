@@ -704,8 +704,37 @@ function* bfs() {
 }
 
 function* dfs() {
-    console.log("i");
-    yield 0;
+    if (clickqueue.length==1 && objType(clickqueue[0]) == "node") {
+        source = clickqueue[0];
+        clickqueue = [];
+        updateToolbarQueue();
+    } else {
+        return;
+    }
+    visited = [source];
+    stack = [[source]];
+    yield [[source]];
+    while (stack.length > 0) {
+        const ne = stack[stack.length-1];
+        if (!visited.includes(ne[0])) {
+            const toYield = [];
+            for (const k of ne) {toYield.push([k])};
+            yield toYield;
+            visited.push(ne[0]);
+        }
+        let remove_from_stack = true;
+        for (const [next_node, par_edge] of adjlist[ne[0]]) {
+            if (!visited.includes(next_node)) {
+                stack.push([next_node,par_edge]);
+                remove_from_stack = false;
+                break;
+            }
+        }
+        if (remove_from_stack) {
+            stack.pop();
+        }
+            
+    }
 }
     
 
