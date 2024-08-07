@@ -285,13 +285,28 @@ class edge {
         const edgepathobj = thisedge.append("path")
             .attr("style", "fill:none; stroke:black; stroke-width:10;")
             .attr("d", makePath(realStart, realEnd, bend))
-            .attr("class", "edgePath")
-        
+            .attr("class", "edgePath");
+
+        if (weight != 0) {
+        const edgelabelpad = thisedge.append("circle")
+            .attr("cx", midpoint[0]).attr("cy", midpoint[1])
+            .attr("r", 15)
+            .attr("fill", "white")
+            .attr("class", "edgeLabelPad");
+    
+        const edgelabel = thisedge.append("text")
+            .attr("x", midpoint[0]).attr("y", midpoint[1])
+            .text(weight).attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central").attr("font-size", 20)
+            .attr("font-family", "Arial, Helvetica, sans-serif")
+            .attr("font-weight", "bold")
+            .attr("class", "edgeLabel");
+        }
+
         if (arrow==1) {
             edgepathobj.attr("marker-end", "url(#arrow-of-"+thisid+")")
         }
             
-
         adjlist[node1].push([node2, thisid]);
 
         if (arrow==0) {adjlist[node2].push([node1, thisid])};
@@ -803,7 +818,6 @@ function* dijkstra() {
 
         const nodeyield = [[popped,(poppeddist == Infinity ? "∞" : poppeddist)]];
 
-        console.log((foundedge ? (nodeyield + [[finaledge]]) : nodeyield));
         yield (foundedge ? nodeyield.concat([[finaledge]]) : nodeyield);
 
         delete fakedist[popped];
