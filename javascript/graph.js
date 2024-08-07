@@ -617,8 +617,9 @@ function highlightToggle(thing) {
 function moveNode(nodeselected, coord) {
     // edit node
     const nodeTarget = d3.select("#" + nodeselected);
-    nodeTarget.select("circle").attr("cx", coord[0]).attr("cy", coord[1]);
-    nodeTarget.select("text").attr("x", coord[0]).attr("y", coord[1]);
+    nodeTarget.select(".nodeCircle").attr("cx", coord[0]).attr("cy", coord[1]);
+    nodeTarget.select(".nodeLabel").attr("x", coord[0]).attr("y", coord[1]);
+    nodeTarget.select(".nodeTag").attr("x", coord[0]).attr("y", Number(coord[1])-1.6*nodeRad);
     // edit edges
     function changeEdge(edgeid) {
         const edgeTarget = d3.select("#"+edgeid);
