@@ -799,7 +799,6 @@ function* dijkstra() {
     const truedist = {};
 
     while (Object.entries(fakedist).length > 0) {
-        console.log(fakedist);
         const popped = extractmin(fakedist);
         const poppeddist = Number(fakedist[popped]);
 
