@@ -220,7 +220,7 @@ let autonodenumber = 1;
 
 class node {
     constructor(x, y, label) {
-        
+
         adjlist["node-"+autonodenumber] = [];
 
         const shapegroup = svg.append("g")
