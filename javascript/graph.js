@@ -227,19 +227,19 @@ class node {
                             .attr("id", "node-"+autonodenumber)
                             .attr("onclick", "nodeClicked(this.id)")
                             .attr("style", "cursor: pointer;")
-                            .attr("highlight", 0)
+                            .attr("highlight", 0);
 
         shapegroup.append("circle")
                 .attr("cx", x).attr("cy", y).attr("r", nodeRad)
                 .attr("fill", nodeColor).attr("stroke", "black")
-                .attr("stroke-width", 5).attr("class", "nodeCircle")
+                .attr("stroke-width", 5).attr("class", "nodeCircle");
 
         shapegroup.append("text")
                 .text(String(label))
                 .attr("x", x).attr("y", y).attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central").attr("font-size", 25)
                 .attr("font-family", "Arial, Helvetica, sans-serif")
-                .attr("font-weight", "bold").attr("class", "nodeLabel")
+                .attr("font-weight", "bold").attr("class", "nodeLabel");
 
         shapegroup.append("text")
                 .text("")
@@ -247,7 +247,7 @@ class node {
                 .attr("dominant-baseline", "central").attr("font-size", 25)
                 .attr("font-family", "Arial, Helvetica, sans-serif")
                 .attr("font-weight", "bold")
-                .attr("fill", "red").attr("class", "nodeTag")
+                .attr("fill", "red").attr("class", "nodeTag");
         
         autonodenumber++;
     }
