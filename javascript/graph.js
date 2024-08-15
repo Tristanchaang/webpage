@@ -666,15 +666,24 @@ function getProp(thingID, property) {
     } catch(err) {
         return;
     }
-
 }
+
+function clearHighlights() {
+    for (const curnode of Object.keys(adjlist)) {
+        highlight(curnode, 0);
+        for (const curnodeedge of adjlist[curnode]) {
+            highlight(curnodeedge[1], 0);
+        }
+    }
+}
+    
 
 ////////////////
 // Graph Algs //
 ////////////////
 
 let mission = null;
-const algs = ["Alg", "BFS", "DFS", "Dijkstra"];
+const algs = ["Alg", "BFS", "DFS", "Dijkstra", "Bellman"];
 let curAlgID = 0;
 
 function assignMission() {
@@ -683,6 +692,7 @@ function assignMission() {
         case "BFS": mission = bfs(); break;
         case "DFS": mission = dfs(); break;
         case "Dijkstra": mission = dijkstra(); break;
+        case "Bellman": mission = bellmanFord(); break;
     }
 }
 
@@ -699,12 +709,7 @@ function nextStep() {
             highlight(obj[0], 1, ...obj.slice(1));
         }
     } else {
-        for (const curnode of Object.keys(adjlist)) {
-            highlight(curnode, 0);
-            for (const curnodeedge of adjlist[curnode]) {
-                highlight(curnodeedge[1], 0);
-            }
-        }
+        clearHighlights();
         assignMission();
         return;
 
@@ -788,14 +793,18 @@ function* dijkstra() {
         return lowestItems[0];
     }
 
+    function showLowlight() {
+        for (const nodeid of Object.keys(fakedist)) {
+            lowlight(nodeid, ((fakedist[nodeid] == Infinity) ? "∞" : fakedist[nodeid]), "blue")
+        }
+    }
+
     const fakedist = {};
 
     for (const nodeid of Object.keys(adjlist)) fakedist[nodeid] = Infinity;
     fakedist[source] = 0;
 
-    for (const nodeid of Object.keys(fakedist)) {
-        lowlight(nodeid, ((fakedist[nodeid] == Infinity) ? "∞" : fakedist[nodeid]), "blue")
-    }
+    showLowlight();
         
     const truedist = {};
 
@@ -832,6 +841,104 @@ function* dijkstra() {
         delete fakedist[popped];
     }   
 }
+
+function* bellmanFord() {
+    if (clickqueue.length==1 && objType(clickqueue[0]) == "node") {
+        source = clickqueue[0];
+        clickqueue = [];
+        updateToolbarQueue();
+    } else {
+        return;
+    }
+
+    function showLowlight() {
+        for (const nodeid of Object.keys(fakedist)) {
+            lowlight(nodeid, ((fakedist[nodeid] == Infinity) ? "∞" : fakedist[nodeid]), "blue")
+        }
+    }
+
+    const numnodes = Object.keys(adjlist).length;
+
+    const edgeset = [];
+
+    const fakedist = {};
+
+    for (const nodeid of Object.keys(adjlist)) fakedist[nodeid] = Infinity;
+
+    fakedist[source] = 0;
+
+    showLowlight();
+
+    for (const nodeid of Object.keys(adjlist)) {
+        for (const [nodeid1, e] of adjlist[nodeid]) {
+            if (!edgeset.includes(e)) {
+                edgeset.push(e);
+            } 
+        }
+    }
+
+    let totalsteps = 0;
+
+    for (const edgeid of edgeset) {
+        if (getProp(edgeid, "arrow") == 1) totalsteps += 1
+        else totalsteps += 2
+    }
+
+    totalsteps *= numnodes;
+
+    d3.select("#inputstatusbox").text(totalsteps).attr("style", "font-family: monospace");
+
+    for (let i = 0; i < numnodes; i++) {
+        for (const edgeid of edgeset) {
+            const edgeStart = getProp(edgeid,"start");
+            const edgeEnd = getProp(edgeid,"end");
+
+            fakedist[edgeEnd] = Math.min(fakedist[edgeEnd], Number(fakedist[edgeStart])+Number(getProp(edgeid, "weight")));
+            
+            clearHighlights();
+            showLowlight();
+
+            yield [[edgeid],[edgeEnd, ((fakedist[edgeEnd] == Infinity) ? "∞" : fakedist[edgeEnd])]];
+
+            totalsteps -= 1;
+            d3.select("#inputstatusbox").text(totalsteps).attr("style", "font-family: monospace");
+
+            if (getProp(edgeid, "arrow")=="0") {
+                fakedist[edgeStart] = Math.min(fakedist[edgeStart], Number(fakedist[edgeEnd])+Number(getProp(edgeid, "weight")));
+            
+                clearHighlights();
+                showLowlight();
+
+                yield [[edgeid],[edgeStart, ((fakedist[edgeStart] == Infinity) ? "∞" : fakedist[edgeStart])]];
+
+                totalsteps -= 1;
+                d3.select("#inputstatusbox").text(totalsteps).attr("style", "font-family: monospace");
+            }
+
+            
+        }
+    }
+
+    clearHighlights();
+    const finalhighlights = [];
+
+    for (const other of Object.keys(fakedist)) {
+        for (const [nb, e] of adjlist[other]) {
+            if (Number(fakedist[nb]) == (Number(fakedist[other]) + Number(getProp(e,"weight")))) {
+                finalhighlights.push([e]);
+            }
+        }
+        finalhighlights.push([other,((fakedist[other] == Infinity) ? "∞" : fakedist[other])]);
+    }
+
+    yield finalhighlights;
+
+
+    d3.select("#inputstatusbox").text("").attr("style", "font-family: monospace");
+
+}
+
+
 //////////////////
 // Manual Input //
 //////////////////
