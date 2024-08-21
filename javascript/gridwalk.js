@@ -20,7 +20,7 @@ function createLevel(gameLevel) {
     
     const levelBackground = canvas.append("g").attr("class", "levelBackground")
     
-    const [rows, cols] = gameLevel.size;
+    const [cols, rows] = gameLevel.size;
 
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
@@ -40,10 +40,42 @@ function createLevel(gameLevel) {
         .attr("r", squareSide*0.3)
         .attr("fill", "lime").attr("stroke", "green")
         .attr("stroke-width", 5).attr("class", "playerNode");
-
-
 }
 
+function oneStep(tile, direction) {
+    
+    const [cols, rows] = gameLevel.size;
+    const minX = (screenWidth-cols*squareSide)/2 + 0.5*squareSide;
+    const minY = (screenHeight-rows*squareSide)/2 + 0.5*squareSide;
+    const maxX = (screenWidth-cols*squareSide)/2 + (cols-0.5)*squareSide;
+    const maxY = (screenHeight-rows*squareSide)/2 + (rows-0.5)*squareSide;
+    switch (direction) {
+        case "U": return [tile[0],Math.max(minY,Number(tile[1])-squareSide)];
+        case "D": return [tile[0],Math.min(maxY,Number(tile[1])+squareSide)];
+        case "L": return [Math.max(minX,Number(tile[0])-squareSide),tile[1]];
+        case "R": return [Math.min(maxX,Number(tile[0])+squareSide),tile[1]];
+    }
+    
+}
+
+
+function movePlayer(direction) {
+    targetHTML = d3.select(".playerNode")
+    const [newx, newy] = oneStep([targetHTML.attr("cx"),targetHTML.attr("cy")], direction)
+    targetHTML.attr("cx", newx).attr("cy", newy)
+}
+
+d3.select("body").on('keydown', (event) => {
+    let direction;
+    switch (event.key) {
+        case "ArrowUp": direction = "U"; break;
+        case "ArrowDown": direction = "D"; break;
+        case "ArrowLeft": direction = "L"; break;
+        case "ArrowRight": direction = "R"; break;
+        default: return
+    }
+    movePlayer(direction);
+})
 
 
 createLevel(gameLevel)
