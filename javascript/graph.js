@@ -1,6 +1,3 @@
-// Major Turn Point: Implement Simple Node Code and Edge Code.
-// Implementing DONE
-
 /////////////////////
 // Math Operations //
 /////////////////////
