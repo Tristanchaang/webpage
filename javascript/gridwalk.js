@@ -9,6 +9,24 @@ const canvas = d3.select("body")
                     .attr("height", screenHeight)
                     .style("position", "fixed");
 
+for (const [l,t,code,dir] of [["100px","50px","&#9650;","U"],["50px","100px","&#9664;","L"],
+                            ["150px","100px","&#9654;","R"],["100px","150px","&#9660;","D"]]) {
+    d3.select("body").append("button")
+        .style("border", "2px outset black")
+        .style("background-color", "gray")
+        .style("height", "50px")
+        .style("width", "50px")
+        .style("left", l)
+        .style("top", t)
+        .style("position", "fixed")
+        .style("cursor", "pointer")
+        .style("font-size", "30px")
+        .style("text-anchor", "middle")
+        .style("dominant-baseline", "central")
+        .attr("onclick", "directionPressed('" + dir + "')")
+        .html(code)
+}
+
 let gameLevel = {
     size: [8,5],
     wall: ["1-0", "4-3", "0-3", "1-3", "2-4", "3-3"],
@@ -145,18 +163,20 @@ function moveAdversary() {
     d3.select("#adversaryNode").attr("cx", curcur[0]).attr("cy", curcur[1])
 }
 
-d3.select("body").on('keydown', (event) => {
+function directionPressed(direction) {
     if (gameStatus == "o") {
-        let direction;
-        switch (event.key) {
-            case "ArrowUp": direction = "U"; break;
-            case "ArrowDown": direction = "D"; break;
-            case "ArrowLeft": direction = "L"; break;
-            case "ArrowRight": direction = "R"; break;
-            default: return
-        }
         movePlayer(direction);
         moveAdversary();
+    }
+}
+
+d3.select("body").on('keydown', (event) => {
+    switch (event.key) {
+        case "ArrowUp": directionPressed("U"); break;
+        case "ArrowDown": directionPressed("D"); break;
+        case "ArrowLeft": directionPressed("L"); break;
+        case "ArrowRight": directionPressed("R"); break;
+        default: return
     }
 })
 
