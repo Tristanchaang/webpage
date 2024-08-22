@@ -26,7 +26,7 @@ for (const [l,t,code,dir] of [["100px","50px","&#9650;","U"],["50px","100px","&#
         .attr("onclick", "directionPressed('" + dir + "')")
         .html(code)
 }
-d3.select("body").append("dir").text("or use arrow keys")
+d3.select("body").append("dir").text("(or use arrow keys)")
     .style("position", "fixed")
     .style("padding-left", "50px")
     .style("top", "200px")
