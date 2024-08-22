@@ -1,6 +1,7 @@
 const screenWidth = window.innerWidth;
 const screenHeight = window.innerHeight;
 const squareSide = 100;
+let gameStatus = "o";
 
 const canvas = d3.select("body")
                     .append("svg")
@@ -98,11 +99,18 @@ function movePlayer(direction) {
     playerTile = oneStep(playerTile, direction);
     const [newx, newy] = realize(playerTile);
     d3.select("#playerNode").attr("cx", newx).attr("cy", newy);
+    if (playerTile.join("-") == gameLevel.end.join("-")) gameStatus = "w";
 }
 
 function moveAdversary() {
     const terminal = playerTile.join("-");
     const source = adversaryTile.join("-");
+
+    if (terminal == source) {
+        endGame(false);
+        return
+    }
+
     const visited = [source];
     const levels = [[source]];
     const parents = {};
@@ -138,19 +146,30 @@ function moveAdversary() {
 }
 
 d3.select("body").on('keydown', (event) => {
-    let direction;
-    switch (event.key) {
-        case "ArrowUp": direction = "U"; break;
-        case "ArrowDown": direction = "D"; break;
-        case "ArrowLeft": direction = "L"; break;
-        case "ArrowRight": direction = "R"; break;
-        default: return
+    if (gameStatus == "o") {
+        let direction;
+        switch (event.key) {
+            case "ArrowUp": direction = "U"; break;
+            case "ArrowDown": direction = "D"; break;
+            case "ArrowLeft": direction = "L"; break;
+            case "ArrowRight": direction = "R"; break;
+            default: return
+        }
+        movePlayer(direction);
+        moveAdversary();
     }
-    movePlayer(direction);
-    moveAdversary();
 })
 
 createLevel(gameLevel)
+
+function endGame(status) {
+    if (status) {
+        gameStatus = "w";
+    }
+    else {
+        gameStatus = "l";
+    }
+}
 
 function animate(delay, duration, func) {
     let t = d3.timer((elapsed) => {
@@ -159,6 +178,7 @@ function animate(delay, duration, func) {
         }, delay)
 }
 
+let flickerPeriod = 500;
 
 let breathing = true
 animate(0, Infinity,
@@ -171,5 +191,14 @@ animate(0, Infinity,
             d3.selectAll(".node")
                 .attr("r", 0.3*squareSide);
         }
+
+        if (gameStatus == "l") {
+            d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"pink":"white");
+        }
+
+        if (gameStatus == "w") {
+            d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"green":"white");
+        }
+
     }
 )
