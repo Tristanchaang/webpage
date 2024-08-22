@@ -11,7 +11,7 @@ const canvas = d3.select("body")
 
 let gameLevel = {
     size: [8,5],
-    wall: ["1-0", "4-3", "0-3", "1-3", "2-3", "3-3"],
+    wall: ["1-0", "4-3", "0-3", "1-3", "2-4", "3-3"],
     start: [0,0],
     end: [7,0]
 };
@@ -197,7 +197,7 @@ animate(0, Infinity,
         }
 
         if (gameStatus == "w") {
-            d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"green":"white");
+            d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"palegreen":"white");
         }
 
     }
