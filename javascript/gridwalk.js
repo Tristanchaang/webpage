@@ -1,5 +1,6 @@
 const screenWidth = window.innerWidth;
 const screenHeight = window.innerHeight;
+const squareSide = 100;
 
 const canvas = d3.select("body")
                     .append("svg")
@@ -7,13 +8,21 @@ const canvas = d3.select("body")
                     .attr("height", screenHeight)
                     .style("position", "fixed");
 
-gameLevel = {
-    size: [3,4],
-    wall: []
+let gameLevel = {
+    size: [8,5],
+    wall: ["1-0", "4-3", "0-3", "1-3", "2-3", "3-3"],
+    start: [0,0],
+    end: [7,0]
 };
 
-const squareSide = 100;
+let adjList = {};
 
+let playerTile = gameLevel.start;
+let adversaryTile = [gameLevel.size[0]-1, gameLevel.size[1]-1];
+
+function isFree(tile) {
+    return (0 <= tile[0] && tile[0] < gameLevel.size[0] && 0 <= tile[1] && tile[1] < gameLevel.size[1] && !(gameLevel.wall.includes(tile.join("-"))))
+}
 
 function createLevel(gameLevel) {
     canvas.selectAll("*").remove()
@@ -22,47 +31,110 @@ function createLevel(gameLevel) {
     
     const [cols, rows] = gameLevel.size;
 
+    let square;
+
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-            levelBackground.append("rect")
+            adjList[[x,y].join("-")] = [];
+            square = levelBackground.append("rect")
                             .attr("x", (screenWidth-cols*squareSide)/2 + squareSide * x)
                             .attr("y", (screenHeight-rows*squareSide)/2 + squareSide * y)
                             .attr("width", squareSide).attr("height", squareSide)
-                            .style("fill", "none").style("stroke", "black").style("stroke-width", "5px");
+                            .style("stroke", "black").style("stroke-width", "5px");
+            if (gameLevel.wall.includes([x,y].join("-"))) square.style("fill", "black");
+            else if ([x,y].join("-") == gameLevel.start.join("-")) square.style("fill", "palegreen");
+            else if ([x,y].join("-") == gameLevel.end.join("-")) square.style("fill", "turquoise");
+            else square.style("fill", "none");
+
+            for (const nb of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]) {
+                if (isFree(nb)) adjList[[x,y].join("-")].push(nb.join("-"))
+            }
         }
     }
 
     const player = canvas.append("g").attr("class", "player")
 
+    const [xPlayer, yPlayer] = realize(playerTile);
     player.append("circle")
-        .attr("cx", (screenWidth-cols*squareSide)/2 + squareSide/2)
-        .attr("cy", (screenHeight-rows*squareSide)/2 + squareSide/2)
+        .attr("cx", xPlayer)
+        .attr("cy", yPlayer)
         .attr("r", squareSide*0.3)
         .attr("fill", "lime").attr("stroke", "green")
-        .attr("stroke-width", 5).attr("class", "playerNode");
+        .attr("stroke-width", 5).attr("class", "node").attr("id", "playerNode");
+
+    const adversary = canvas.append("g").attr("class", "adversary")
+
+    const [xAdversary, yAdversary] = realize(adversaryTile);
+    adversary.append("circle")
+        .attr("cx", xAdversary)
+        .attr("cy", yAdversary)
+        .attr("r", squareSide*0.3)
+        .attr("fill", "pink").attr("stroke", "red")
+        .attr("stroke-width", 5).attr("class", "node").attr("id", "adversaryNode");
+}
+
+function realize(tile) {
+    const [cols, rows] = gameLevel.size
+    return [(screenWidth-(cols-1)*squareSide)/2 + squareSide*tile[0], 
+            (screenHeight-(rows-1)*squareSide)/2 + squareSide*tile[1]]
 }
 
 function oneStep(tile, direction) {
     
     const [cols, rows] = gameLevel.size;
-    const minX = (screenWidth-cols*squareSide)/2 + 0.5*squareSide;
-    const minY = (screenHeight-rows*squareSide)/2 + 0.5*squareSide;
-    const maxX = (screenWidth-cols*squareSide)/2 + (cols-0.5)*squareSide;
-    const maxY = (screenHeight-rows*squareSide)/2 + (rows-0.5)*squareSide;
+    let raw;
     switch (direction) {
-        case "U": return [tile[0],Math.max(minY,Number(tile[1])-squareSide)];
-        case "D": return [tile[0],Math.min(maxY,Number(tile[1])+squareSide)];
-        case "L": return [Math.max(minX,Number(tile[0])-squareSide),tile[1]];
-        case "R": return [Math.min(maxX,Number(tile[0])+squareSide),tile[1]];
+        case "U": raw = [tile[0],Number(tile[1])-1]; break;
+        case "D": raw = [tile[0],Number(tile[1])+1]; break;
+        case "L": raw = [Number(tile[0])-1,tile[1]]; break;
+        case "R": raw = [Number(tile[0])+1,tile[1]]; break;
+        default: return;
     }
-    
+    return (isFree(raw) ? raw : tile);
 }
 
 
 function movePlayer(direction) {
-    targetHTML = d3.select(".playerNode")
-    const [newx, newy] = oneStep([targetHTML.attr("cx"),targetHTML.attr("cy")], direction)
-    targetHTML.attr("cx", newx).attr("cy", newy)
+    playerTile = oneStep(playerTile, direction);
+    const [newx, newy] = realize(playerTile);
+    d3.select("#playerNode").attr("cx", newx).attr("cy", newy);
+}
+
+function moveAdversary() {
+    const terminal = playerTile.join("-");
+    const source = adversaryTile.join("-");
+    const visited = [source];
+    const levels = [[source]];
+    const parents = {};
+
+    parents[source] = null;
+
+    cur_level = 0;
+    while (true) {
+        levels.push([]);
+        if (levels[cur_level].length == 0) {break}
+        for (const v of levels[cur_level]) {
+            for (const nb of adjList[v]) {
+                if (!visited.includes(nb)) {
+                    visited.push(nb)
+                    parents[nb] = v;
+                    levels[cur_level+1].push(nb)
+                }
+            }
+                
+        }
+        cur_level++;
+    }
+
+    let cur = terminal;
+
+    while (parents[cur] != source) {
+        cur = parents[cur]
+    }
+    adversaryTile = cur.split("-");
+    
+    const curcur = realize(cur.split("-"))
+    d3.select("#adversaryNode").attr("cx", curcur[0]).attr("cy", curcur[1])
 }
 
 d3.select("body").on('keydown', (event) => {
@@ -75,8 +147,8 @@ d3.select("body").on('keydown', (event) => {
         default: return
     }
     movePlayer(direction);
+    moveAdversary();
 })
-
 
 createLevel(gameLevel)
 
@@ -92,11 +164,11 @@ let breathing = true
 animate(0, Infinity,
     (elapsed) => {
         if (breathing) {
-            d3.selectAll(".playerNode")
+            d3.selectAll(".node")
                 .attr("r", 0.3*squareSide + 2.5*Math.sin(elapsed/500));
                 
         } else {
-            d3.selectAll(".playerNode")
+            d3.selectAll(".node")
                 .attr("r", 0.3*squareSide);
         }
     }
