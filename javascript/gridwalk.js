@@ -139,6 +139,7 @@ function movePlayer(direction) {
     playerTile = oneStep(playerTile, direction);
     const [newx, newy] = realize(playerTile);
     d3.select("#playerNode").attr("cx", newx).attr("cy", newy);
+    
     if (playerTile.join("-") == gameLevels[levelNum].end.join("-")) endGame(true);
 }
 
@@ -146,10 +147,7 @@ function moveAdversary() {
     const terminal = playerTile.join("-");
     const source = adversaryTile.join("-");
 
-    if (terminal == source) {
-        endGame(false);
-        return
-    }
+    
 
     const visited = [source];
     const levels = [[source]];
@@ -184,16 +182,24 @@ function moveAdversary() {
     const curcur = realize(cur.split("-"));
     d3.select("#adversaryNode").attr("cx", curcur[0]).attr("cy", curcur[1]);
 
-    if (cur == terminal) {
-        endGame(false);
-        return
-    }
 }
 
 function directionPressed(direction) {
     if (gameStatus == "o") {
+
+        // player's turn
         movePlayer(direction);
+        if (playerTile.join("-") == adversaryTile.join("-")) {
+            endGame(false);
+            return;
+        }
+
+        // adversary's turn
         moveAdversary();
+        if (playerTile.join("-") == adversaryTile.join("-")) {
+            endGame(false);
+            return;
+        }
     }
 }
 
@@ -266,7 +272,7 @@ function thankYou() {
     .style("dominant-baseline", "central");
 }
 
-let breathing = true
+let breathing = true;
 animate(0, Infinity,
     (elapsed) => {
         if (breathing) {
