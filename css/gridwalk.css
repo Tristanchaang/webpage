@@ -1,0 +1,11 @@
+.controller {
+    border: 2px outset black;
+    background-color: gray;
+    height: 50px;
+    width: 50px;
+    position: fixed;
+    cursor: pointer;
+    font-size: 30px;
+    text-anchor: middle;
+    dominant-baseline: central;
+}

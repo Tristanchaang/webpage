@@ -12,18 +12,10 @@ const canvas = d3.select("body")
 for (const [l,t,code,dir] of [["100px","50px","&#9650;","U"],["50px","100px","&#9664;","L"],
                             ["150px","100px","&#9654;","R"],["100px","150px","&#9660;","D"]]) {
     d3.select("body").append("button")
-        .style("border", "2px outset black")
-        .style("background-color", "gray")
-        .style("height", "50px")
-        .style("width", "50px")
         .style("left", l)
         .style("top", t)
-        .style("position", "fixed")
-        .style("cursor", "pointer")
-        .style("font-size", "30px")
-        .style("text-anchor", "middle")
-        .style("dominant-baseline", "central")
         .attr("onclick", "directionPressed('" + dir + "')")
+        .attr("class", "controller")
         .html(code)
 }
 d3.select("body").append("dir").text("(or use arrow keys)")
@@ -33,26 +25,50 @@ d3.select("body").append("dir").text("(or use arrow keys)")
     .style("font-family", "arial")
     .style("font-size", "20px")
 
-let gameLevel = {
-    size: [8,5],
-    wall: ["1-0", "4-3", "0-3", "1-3", "2-4", "3-3"],
-    start: [0,0],
-    end: [7,0]
-};
+let gameLevels = [
+    {
+        size: [8,4],
+        wall: [], // processed below
+        start: [0,3],
+        end: [7,3],
+        adversary: [0,0]
+    },
+    {
+        size: [8,5],
+        wall: ["1-0", "4-3", "0-3", "1-3", "2-4", "3-3"],
+        start: [0,0],
+        end: [7,0],
+        adversary: [7,4]
+    },
+];
+
+for (let k = 1; k < 8; k++) {
+    for (let l = 0; l < 3; l++) {
+        gameLevels[0].wall.push(k+"-"+l);
+    }
+}
+
+let gameLevel = gameLevels[0]
 
 let adjList = {};
 
-let playerTile = gameLevel.start;
-let adversaryTile = [gameLevel.size[0]-1, gameLevel.size[1]-1];
+let playerTile, adversaryTile;
 
 function isFree(tile) {
-    return (0 <= tile[0] && tile[0] < gameLevel.size[0] && 0 <= tile[1] && tile[1] < gameLevel.size[1] && !(gameLevel.wall.includes(tile.join("-"))))
+    return (0 <= tile[0] && tile[0] < gameLevel.size[0] && 
+        0 <= tile[1] && tile[1] < gameLevel.size[1] && 
+        !(gameLevel.wall.includes(tile.join("-"))))
 }
 
 function createLevel(gameLevel) {
     canvas.selectAll("*").remove()
+
+    gameStatus = "o";
+
+    playerTile = gameLevel.start;
+    adversaryTile = gameLevel.adversary;
     
-    const levelBackground = canvas.append("g").attr("class", "levelBackground")
+    const levelBackground = canvas.insert("g", ".controller").attr("class", "levelBackground")
     
     const [cols, rows] = gameLevel.size;
 
@@ -153,7 +169,6 @@ function moveAdversary() {
                     levels[cur_level+1].push(nb)
                 }
             }
-                
         }
         cur_level++;
     }
@@ -165,8 +180,14 @@ function moveAdversary() {
     }
     adversaryTile = cur.split("-");
     
-    const curcur = realize(cur.split("-"))
-    d3.select("#adversaryNode").attr("cx", curcur[0]).attr("cy", curcur[1])
+    
+    const curcur = realize(cur.split("-"));
+    d3.select("#adversaryNode").attr("cx", curcur[0]).attr("cy", curcur[1]);
+
+    if (cur == terminal) {
+        endGame(false);
+        return
+    }
 }
 
 function directionPressed(direction) {
