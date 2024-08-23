@@ -9,8 +9,8 @@ const canvas = d3.select("body")
                     .attr("height", screenHeight)
                     .style("position", "fixed");
 
-for (const [l,t,code,dir] of [["100px","50px","&#9650;","U"],["50px","100px","&#9664;","L"],
-                            ["150px","100px","&#9654;","R"],["100px","150px","&#9660;","D"]]) {
+for (const [l,t,code,dir] of [["130px","50px","&#9650;","U"],["50px","130px","&#9664;","L"],
+                            ["210px","130px","&#9654;","R"],["130px","210px","&#9660;","D"]]) {
     d3.select("body").append("button")
         .style("left", l)
         .style("top", t)
@@ -21,9 +21,9 @@ for (const [l,t,code,dir] of [["100px","50px","&#9650;","U"],["50px","100px","&#
 d3.select("body").append("dir").text("(or use arrow keys)")
     .style("position", "fixed")
     .style("padding-left", "50px")
-    .style("top", "200px")
+    .style("top", "280px")
     .style("font-family", "arial")
-    .style("font-size", "20px")
+    .style("font-size", "25px")
 
 let gameLevels = [
     {
@@ -83,8 +83,8 @@ function createLevel(gameLevel) {
                             .attr("width", squareSide).attr("height", squareSide)
                             .style("stroke", "black").style("stroke-width", "5px");
             if (gameLevel.wall.includes([x,y].join("-"))) square.style("fill", "black");
-            else if ([x,y].join("-") == gameLevel.start.join("-")) square.style("fill", "palegreen");
-            else if ([x,y].join("-") == gameLevel.end.join("-")) square.style("fill", "turquoise");
+            else if ([x,y].join("-") == gameLevel.start.join("-")) square.style("fill", "turquoise");
+            else if ([x,y].join("-") == gameLevel.end.join("-")) square.style("fill", "palegreen");
             else square.style("fill", "none");
 
             for (const nb of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]) {
