@@ -48,16 +48,16 @@ for (let k = 1; k < 8; k++) {
     }
 }
 
-let gameLevel = gameLevels[0]
+let levelNum = 0;
 
 let adjList = {};
 
 let playerTile, adversaryTile;
 
 function isFree(tile) {
-    return (0 <= tile[0] && tile[0] < gameLevel.size[0] && 
-        0 <= tile[1] && tile[1] < gameLevel.size[1] && 
-        !(gameLevel.wall.includes(tile.join("-"))))
+    return (0 <= tile[0] && tile[0] < gameLevels[levelNum].size[0] && 
+        0 <= tile[1] && tile[1] < gameLevels[levelNum].size[1] && 
+        !(gameLevels[levelNum].wall.includes(tile.join("-"))))
 }
 
 function createLevel(gameLevel) {
@@ -115,14 +115,14 @@ function createLevel(gameLevel) {
 }
 
 function realize(tile) {
-    const [cols, rows] = gameLevel.size
+    const [cols, rows] = gameLevels[levelNum].size
     return [(screenWidth-(cols-1)*squareSide)/2 + squareSide*tile[0], 
             (screenHeight-(rows-1)*squareSide)/2 + squareSide*tile[1]]
 }
 
 function oneStep(tile, direction) {
     
-    const [cols, rows] = gameLevel.size;
+    const [cols, rows] = gameLevels[levelNum].size;
     let raw;
     switch (direction) {
         case "U": raw = [tile[0],Number(tile[1])-1]; break;
@@ -139,7 +139,7 @@ function movePlayer(direction) {
     playerTile = oneStep(playerTile, direction);
     const [newx, newy] = realize(playerTile);
     d3.select("#playerNode").attr("cx", newx).attr("cy", newy);
-    if (playerTile.join("-") == gameLevel.end.join("-")) gameStatus = "w";
+    if (playerTile.join("-") == gameLevels[levelNum].end.join("-")) endGame(true);
 }
 
 function moveAdversary() {
@@ -207,25 +207,64 @@ d3.select("body").on('keydown', (event) => {
     }
 })
 
-createLevel(gameLevel)
+createLevel(gameLevels[levelNum])
+
+let flickerPeriod = 500;
 
 function endGame(status) {
     if (status) {
         gameStatus = "w";
+        animate(0, 2800,
+            (elapsed) => {
+                d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"palegreen":"white");
+            }
+        )
+        
+        setTimeout(function() {
+            d3.select("body").style("background-color", "white")
+            levelNum += 1;
+            levelNum < gameLevels.length ? createLevel(gameLevels[levelNum]) : thankYou();
+          }, 3000)
     }
     else {
         gameStatus = "l";
+        animate(0, 2800,
+            (elapsed) => {
+                d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"pink":"white");
+            }
+        )
+        d3.select("body").style("background-color", "white")
+        setTimeout(function() {;
+            d3.select("body").style("background-color", "white")
+            createLevel(gameLevels[levelNum]);
+          }, 3000)
     }
 }
 
 function animate(delay, duration, func) {
     let t = d3.timer((elapsed) => {
         func(elapsed);
-        if (elapsed >= duration) {t.stop();}
+        if (elapsed >= delay+duration) {t.stop();}
         }, delay)
 }
 
-let flickerPeriod = 500;
+
+function thankYou() {
+    canvas.selectAll("*").remove()
+    gameStatus = "e"
+    canvas.append("text").text("thx for playing")
+    .attr("x", screenWidth/2)
+    .attr("y", screenHeight/2 - 40)
+    .style("font", "80px arial")
+    .style("text-anchor", "middle")
+    .style("dominant-baseline", "central");
+    canvas.append("text").text("reload to restart lol")
+    .attr("x", screenWidth/2)
+    .attr("y", screenHeight/2 + 40)
+    .style("font", "50px arial")
+    .style("text-anchor", "middle")
+    .style("dominant-baseline", "central");
+}
 
 let breathing = true
 animate(0, Infinity,
@@ -237,14 +276,6 @@ animate(0, Infinity,
         } else {
             d3.selectAll(".node")
                 .attr("r", 0.3*squareSide);
-        }
-
-        if (gameStatus == "l") {
-            d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"pink":"white");
-        }
-
-        if (gameStatus == "w") {
-            d3.select("body").style("background-color", (elapsed%(flickerPeriod) < flickerPeriod/2)?"palegreen":"white");
         }
 
     }
