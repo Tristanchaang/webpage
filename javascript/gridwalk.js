@@ -28,14 +28,38 @@ d3.select("body").append("dir").text("(or use arrow keys)")
 let gameLevels = [
     {
         size: [8,4],
-        wall: [], // processed below
+        wall: [
+            "01111111",
+            "01111111",
+            "01111111",
+            "00000000"
+            ], // processed below
         start: [0,3],
         end: [7,3],
         adversary: [0,0]
     },
     {
         size: [8,5],
-        wall: ["1-0", "4-3", "0-3", "1-3", "2-4", "3-3"],
+        wall: [
+            "11000001",
+            "11011101",
+            "00011100",
+            "11011101",
+            "11000001"  
+            ],
+        start: [0,2],
+        end: [7,2],
+        adversary: [5,4]
+    },
+    {
+        size: [8,5],
+        wall: [
+            "01100000",
+            "00000011",
+            "00000000",
+            "11100000",
+            "11100000"
+        ],
         start: [0,0],
         end: [7,0],
         adversary: [7,4]
@@ -55,7 +79,7 @@ let playerTile, adversaryTile, adjList;
 function isFree(tile) {
     return (0 <= tile[0] && tile[0] < gameLevels[levelNum].size[0] && 
         0 <= tile[1] && tile[1] < gameLevels[levelNum].size[1] && 
-        !(gameLevels[levelNum].wall.includes(tile.join("-"))))
+        !(gameLevels[levelNum].wall[tile[1]][tile[0]] == "1"))
 }
 
 function createLevel(gameLevel) {
@@ -81,7 +105,7 @@ function createLevel(gameLevel) {
                             .attr("y", (screenHeight-rows*squareSide)/2 + squareSide * y)
                             .attr("width", squareSide).attr("height", squareSide)
                             .style("stroke", "black").style("stroke-width", "5px");
-            if (gameLevel.wall.includes([x,y].join("-"))) square.style("fill", "black");
+            if (gameLevel.wall[y][x] == "1") square.style("fill", "black");
             else if ([x,y].join("-") == gameLevel.start.join("-")) square.style("fill", "turquoise");
             else if ([x,y].join("-") == gameLevel.end.join("-")) square.style("fill", "palegreen");
             else square.style("fill", "none");
