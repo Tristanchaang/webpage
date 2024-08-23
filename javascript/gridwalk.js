@@ -50,9 +50,7 @@ for (let k = 1; k < 8; k++) {
 
 let levelNum = 0;
 
-let adjList = {};
-
-let playerTile, adversaryTile;
+let playerTile, adversaryTile, adjList;
 
 function isFree(tile) {
     return (0 <= tile[0] && tile[0] < gameLevels[levelNum].size[0] && 
@@ -67,6 +65,7 @@ function createLevel(gameLevel) {
 
     playerTile = gameLevel.start;
     adversaryTile = gameLevel.adversary;
+    adjList = {};
     
     const levelBackground = canvas.insert("g", ".controller").attr("class", "levelBackground")
     
@@ -146,9 +145,6 @@ function movePlayer(direction) {
 function moveAdversary() {
     const terminal = playerTile.join("-");
     const source = adversaryTile.join("-");
-
-    
-
     const visited = [source];
     const levels = [[source]];
     const parents = {};
@@ -181,7 +177,6 @@ function moveAdversary() {
     
     const curcur = realize(cur.split("-"));
     d3.select("#adversaryNode").attr("cx", curcur[0]).attr("cy", curcur[1]);
-
 }
 
 function directionPressed(direction) {
