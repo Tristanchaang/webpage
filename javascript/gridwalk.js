@@ -9,19 +9,20 @@ const canvas = d3.select("body")
                     .attr("height", screenHeight)
                     .style("position", "fixed");
 
-for (const [l,t,code,dir] of [["130px","50px","&#9650;","U"],["50px","130px","&#9664;","L"],
-                            ["210px","130px","&#9654;","R"],["130px","210px","&#9660;","D"]]) {
+for (const [l,t,code,dir] of [["130px","210px","&#9650;","U"],["210px","130px","&#9664;","L"],
+                            ["50px","130px","&#9654;","R"],["130px","50px","&#9660;","D"]]) {
     d3.select("body").append("button")
-        .style("left", l)
-        .style("top", t)
+        .style("right", l)
+        .style("bottom", t)
         .attr("onclick", "directionPressed('" + dir + "')")
         .attr("class", "controller")
         .html(code)
 }
 d3.select("body").append("dir").text("(or use arrow keys)")
     .style("position", "fixed")
-    .style("padding-left", "50px")
-    .style("top", "280px")
+    .style("align", "right")
+    .style("padding-right", "50px")
+    .style("bottom", "100px")
     .style("font-family", "arial")
     .style("font-size", "25px")
 
@@ -33,7 +34,7 @@ let gameLevels = [
             "01111111",
             "01111111",
             "00000000"
-            ], // processed below
+            ], 
         start: [0,3],
         end: [7,3],
         adversary: [0,0]
@@ -114,6 +115,8 @@ function createLevel(gameLevel) {
     for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
             adjList[[x,y].join("-")] = [];
+
+            // draw map
             square = levelBackground.append("rect")
                             .attr("x", (screenWidth-cols*squareSide)/2 + squareSide * x)
                             .attr("y", (screenHeight-rows*squareSide)/2 + squareSide * y)
@@ -124,6 +127,7 @@ function createLevel(gameLevel) {
             else if ([x,y].join("-") == gameLevel.end.join("-")) square.style("fill", "palegreen");
             else square.style("fill", "none");
 
+            // build adjacency list
             for (const nb of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]) {
                 if (isFree(nb)) adjList[[x,y].join("-")].push(nb.join("-"))
             }
@@ -132,7 +136,7 @@ function createLevel(gameLevel) {
 
     const player = canvas.append("g").attr("class", "player")
 
-    const [xPlayer, yPlayer] = realize(playerTile);
+    const [xPlayer, yPlayer] = intToCoord(playerTile);
     player.append("circle")
         .attr("cx", xPlayer)
         .attr("cy", yPlayer)
@@ -142,7 +146,7 @@ function createLevel(gameLevel) {
 
     const adversary = canvas.append("g").attr("class", "adversary")
 
-    const [xAdversary, yAdversary] = realize(adversaryTile);
+    const [xAdversary, yAdversary] = intToCoord(adversaryTile);
     adversary.append("circle")
         .attr("cx", xAdversary)
         .attr("cy", yAdversary)
@@ -151,7 +155,7 @@ function createLevel(gameLevel) {
         .attr("stroke-width", 5).attr("class", "node").attr("id", "adversaryNode");
 }
 
-function realize(tile) {
+function intToCoord(tile) {
     const [cols, rows] = gameLevels[levelNum].size
     return [(screenWidth-(cols-1)*squareSide)/2 + squareSide*tile[0], 
             (screenHeight-(rows-1)*squareSide)/2 + squareSide*tile[1]]
@@ -171,10 +175,9 @@ function oneStep(tile, direction) {
     return (isFree(raw) ? raw : tile);
 }
 
-
 function movePlayer(direction) {
     playerTile = oneStep(playerTile, direction);
-    const [newx, newy] = realize(playerTile);
+    const [newx, newy] = intToCoord(playerTile);
     d3.select("#playerNode").attr("cx", newx).attr("cy", newy);
     
     if (playerTile.join("-") == gameLevels[levelNum].end.join("-")) endGame(true);
@@ -213,7 +216,7 @@ function moveAdversary() {
     adversaryTile = cur.split("-");
     
     
-    const curcur = realize(cur.split("-"));
+    const curcur = intToCoord(cur.split("-"));
     d3.select("#adversaryNode").attr("cx", curcur[0]).attr("cy", curcur[1]);
 }
 
@@ -319,3 +322,27 @@ animate(0, Infinity,
 
     }
 )
+
+let winningPositions = []
+let losingPositions = []
+let freeTiles = []
+
+function buildStrategies() {
+    winningPositions = []
+    losingPositions = []
+    freeTiles = []
+    const [cols, rows] = gameLevels[levelNum].size
+
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            if (gameLevels[levelNum].wall[y][x] == "0") freeTiles.push([x,y]);
+        }
+    }
+
+    console.log(freeTiles)
+}
+
+function winOrLose(playerTile, adversaryTile, turn) {
+    if (turn != "A" && turn != "P") return;
+    if (playerTile == gameLevels[levelNum].end && turn == "P") return true;
+}
