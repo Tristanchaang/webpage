@@ -194,6 +194,71 @@ function saveFile() {
     clickqueue = [];
 }
 
+function saveTeX() {
+    inputstatus = "";
+    clickqueue = [];
+    updateToolbarQueue();
+    d3.select("#inputstatusbox").text(inputstatus).attr("style", "font-family: monospace");
+    
+    const nodeRecord = [];
+    const edgeRecord = [];
+    const visitedEdges = [];
+    let toSave = "\\begin{tikzpicture}[->, thick, main/.style = {circle,draw, inner sep = 0pt, minimum size = 0.6cm}, edge/.style = {circle, midway, fill=white, inner sep=0pt, minimum size=0.4cm}, scale = 0.5]\n\n"
+
+    let numbering = 1
+    for (const nodexy of Object.keys(adjlist)) {
+        nodeRecord.push([Number(nodexy.slice(5)),getProp(nodexy,"coord").join(",") + "," + getProp(nodexy,"label") + ";"]);
+        const [oldx, oldy] = getProp(nodexy,"coord")
+        toSave += "    \\node[main] (" + numbering + ") at (" + String(oldx/50) + "," + String(oldy/(-50)) + ") {" + getProp(nodexy,"label") + "};\n"
+        numbering += 1
+    }
+
+    const ascendingIDs = [];
+    for (const thing of nodeRecord) {
+        ascendingIDs.push(thing[0]);
+    }
+
+    function oldToNew(no) {
+        return Number(ascendingIDs.findIndex((x)=>(x==no)))+1;
+    }
+
+    toSave += "\n    \\path\n"
+    for (const nodexy of Object.keys(adjlist)) {
+        for (const edgeobj of adjlist[nodexy]) {
+            const edgeid = edgeobj[1];
+            if (!visitedEdges.includes(edgeid)) {
+                const newstart = oldToNew(Number(getProp(edgeid, "start").slice(5)));
+                const newend = oldToNew(Number(getProp(edgeid, "end").slice(5)));
+                edgeRecord.push("node-" + newstart + ","
+                        + "node-" + newend + ","
+                        + getProp(edgeid, "arrow") + ","
+                        + getProp(edgeid, "weight") + ","
+                        + getProp(edgeid, "bend")+";");
+                visitedEdges.push(edgeid)
+
+                toSave += "        (" + newstart + ") edge[bend right = " + getProp(edgeid, "bend") + "] " + ( getProp(edgeid, "weight") != 0 ? "node[edge] {" + getProp(edgeid, "weight") + "}" : "") + " (" + newend + ")\n"
+            }
+            
+        }
+    }
+
+    toSave += ";\n\\end{tikzpicture}"
+
+
+    let element = document.createElement('a');
+    let filename = document.getElementById('saveTeXName').value
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(toSave));
+    element.setAttribute('download', filename+'.tex');
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+
+    inputstatus = "";
+    clickqueue = [];
+}
+
 //////////////////////
 // Background Setup //
 //////////////////////
