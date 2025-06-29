@@ -1005,12 +1005,12 @@ function* bellmanFord() {
 // Manual Input //
 //////////////////
 
-const N = 5, M = 3;
+// const N = 5, M = 3;
 
-for (let i = 0; i < N; i++) {
-    new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
-    Math.round(200 - 100 * Math.cos(2 * Math.PI * i / N)), "a"+String(i))
-}
+// for (let i = 0; i < N; i++) {
+//     new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / N)), 
+//     Math.round(200 - 100 * Math.cos(2 * Math.PI * i / N)), "a"+String(i))
+// }
 
 // for (let i = 0; i < M; i++) {
 //     new node(Math.round(200 + 100 * Math.sin(2 * Math.PI * i / M)), 
